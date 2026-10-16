@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "leaflet/dist/leaflet.css";
+
+.wonderla-map-pin-wrap { background: transparent; border: 0; }
+.wonderla-map-pin { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 2px solid white; border-radius: 50% 50% 50% 0; color: white; font-size: 17px; font-weight: 800; box-shadow: 0 2px 7px #0f172a66; transform: rotate(-45deg); }
+.wonderla-map-pin::first-letter { transform: rotate(45deg); }
+
+:root {
+  --font-mulish: "Mulish", system-ui, sans-serif;
+  --font-anton: "Anton", system-ui, sans-serif;
+  --font-oswald: "Oswald", system-ui, sans-serif;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+.mulish,
+.font-mulish {
+  font-family: var(--font-mulish);
+}
