@@ -38,6 +38,15 @@ const RideWaitTimeStep = ({ updateStep, data, onRefresh, refreshing, refreshErro
           <div className="min-w-0 flex-1">
             <h3 className="font-anton text-lg uppercase tracking-tight text-[#0F1C3F]">{item.title}</h3>
             <p className="font-mulish text-xs text-[#0F1C3F]/70">{item.description}</p>
+            {item.kioskBookingEnabled && item.kioskBookingMessage && (
+              <div className="mt-2 flex items-start gap-2 rounded-xl border border-violet-100 bg-violet-50 px-2.5 py-2">
+                <span aria-hidden="true" className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-violet-100 text-[10px]">K</span>
+                <div>
+                  <p className="font-mulish text-[9px] font-extrabold uppercase tracking-wider text-violet-700">Book at a kiosk</p>
+                  <p className="mt-0.5 font-mulish text-xs leading-relaxed text-violet-950">{item.kioskBookingMessage}</p>
+                </div>
+              </div>
+            )}
           </div>
           <span
             className={`shrink-0 rounded-full px-3 py-1 font-mulish text-xs font-bold text-white ${

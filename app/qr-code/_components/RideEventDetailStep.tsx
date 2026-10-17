@@ -54,6 +54,15 @@ const RideEventDetailStep = ({ updateStep, rides, events }: Props) => {
               )}
               <h3 className="mt-1 font-anton text-lg uppercase tracking-tight text-[#0F1C3F]">{item.title}</h3>
               <p className="mt-0.5 font-mulish text-xs text-[#0F1C3F]/75">{item.description}</p>
+              {activeTab === "rides" && item.kioskBookingEnabled && item.kioskBookingMessage && (
+                <div className="mt-3 flex items-start gap-2 rounded-xl border border-violet-100 bg-violet-50 px-3 py-2.5">
+                  <span aria-hidden="true" className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-violet-100 text-xs">K</span>
+                  <div className="min-w-0">
+                    <p className="font-mulish text-[10px] font-extrabold uppercase tracking-wider text-violet-700">Book a time slot at a kiosk</p>
+                    <p className="mt-0.5 font-mulish text-xs leading-relaxed text-violet-950">{item.kioskBookingMessage}</p>
+                  </div>
+                </div>
+              )}
               {item.tags && item.tags.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {item.tags.map((t) => (

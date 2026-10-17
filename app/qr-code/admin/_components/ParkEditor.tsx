@@ -340,7 +340,7 @@ const ParkEditor = ({ config, onSaved, onDeleted, canManagePark = true }: Props)
       <Section
         visible={activeSection === "Rides"}
         title="Rides"
-        onAdd={() => addTo<MediaItem>("rides", { img: "", title: "", description: "" })}
+        onAdd={() => addTo<MediaItem>("rides", { img: "", title: "", description: "", kioskBookingEnabled: false, kioskBookingMessage: "" })}
         addLabel="+ Add ride"
       >
         {draft.rides.map((r, i) => (
@@ -349,6 +349,8 @@ const ParkEditor = ({ config, onSaved, onDeleted, canManagePark = true }: Props)
             <ImageField parkSlug={draft.slug} label="Ride image" value={r.img} onChange={(v) => updateAt<MediaItem>("rides", i, { img: v })} />
             <Area label="Description" value={r.description} onChange={(v) => updateAt<MediaItem>("rides", i, { description: v })} />
             <Text label="Tags (comma separated)" value={(r.tags || []).join(", ")} onChange={(v) => updateAt<MediaItem>("rides", i, { tags: v.split(",").map((x) => x.trim()).filter(Boolean) })} />
+            <Toggle label="Show kiosk slot booking info for this ride" value={r.kioskBookingEnabled ?? false} onChange={(v) => updateAt<MediaItem>("rides", i, { kioskBookingEnabled: v })} />
+            {r.kioskBookingEnabled && <Area label="Kiosk booking message" value={r.kioskBookingMessage || ""} onChange={(v) => updateAt<MediaItem>("rides", i, { kioskBookingMessage: v })} />}
           </Row>
         ))}
       </Section>
@@ -375,7 +377,7 @@ const ParkEditor = ({ config, onSaved, onDeleted, canManagePark = true }: Props)
       <Section
         visible={activeSection === "Live Ride Wait Times"}
         title="Live Ride Wait Times"
-        onAdd={() => addTo<WaitTimeItem>("liveWaitTimes", { img: "", title: "", description: "", time: 0 })}
+        onAdd={() => addTo<WaitTimeItem>("liveWaitTimes", { img: "", title: "", description: "", time: 0, kioskBookingEnabled: false, kioskBookingMessage: "" })}
         addLabel="+ Add ride"
       >
         {draft.liveWaitTimes.map((w, i) => (
@@ -384,6 +386,8 @@ const ParkEditor = ({ config, onSaved, onDeleted, canManagePark = true }: Props)
             <Num label="Wait (mins)" value={w.time} onChange={(v) => updateAt<WaitTimeItem>("liveWaitTimes", i, { time: v })} />
             <ImageField parkSlug={draft.slug} label="Ride image" value={w.img} onChange={(v) => updateAt<WaitTimeItem>("liveWaitTimes", i, { img: v })} />
             <Area label="Description" value={w.description} onChange={(v) => updateAt<WaitTimeItem>("liveWaitTimes", i, { description: v })} />
+            <Toggle label="Show kiosk slot booking info for this ride" value={w.kioskBookingEnabled ?? false} onChange={(v) => updateAt<WaitTimeItem>("liveWaitTimes", i, { kioskBookingEnabled: v })} />
+            {w.kioskBookingEnabled && <Area label="Kiosk booking message" value={w.kioskBookingMessage || ""} onChange={(v) => updateAt<WaitTimeItem>("liveWaitTimes", i, { kioskBookingMessage: v })} />}
           </Row>
         ))}
       </Section>
