@@ -46,14 +46,37 @@ const ParkEditor = ({ config, onSaved, onDeleted, canManagePark = true }: Props)
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [baseUrl, setBaseUrl] = useState("");
+  const [qrUrlError, setQrUrlError] = useState("");
   const [qrImageUrl, setQrImageUrl] = useState("");
   const [pinPlacementIndex, setPinPlacementIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    setBaseUrl(window.location.origin);
+    let active = true;
+    fetch("/qr-code/api/site-url", { cache: "no-store" })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Could not determine the public park URL.");
+        return data;
+      })
+      .then((data) => {
+        if (active) {
+          setBaseUrl(data.origin || window.location.origin);
+          setQrUrlError("");
+        }
+      })
+      .catch((error: unknown) => {
+        if (!active) return;
+        if (window.location.hostname.endsWith(".vercel.app")) {
+          setBaseUrl("");
+          setQrUrlError(error instanceof Error ? error.message : "Could not determine the public park URL.");
+        } else {
+          setBaseUrl(window.location.origin);
+        }
+      });
+    return () => { active = false; };
   }, []);
 
-  const qrUrl = `${baseUrl}/qr-code/${draft.slug}`;
+  const qrUrl = baseUrl ? `${baseUrl}/qr-code/${draft.slug}` : "";
   useEffect(() => {
     if (!qrUrl || qrUrl.startsWith("/")) return;
     let active = true;
@@ -166,10 +189,11 @@ const ParkEditor = ({ config, onSaved, onDeleted, canManagePark = true }: Props)
         <div className="min-w-0 flex-1">
           <h3 className="text-base font-bold text-slate-800">📱 QR code for {draft.name}</h3>
           <p className="mt-1 text-sm text-slate-600">Scanning this code opens {draft.name}’s first guest screen. Guests can then choose the park map, rides, menus, wait times and other information.</p>
-          <p className="mt-2 break-all rounded-md bg-white px-3 py-2 text-xs text-indigo-700">{qrUrl || `/qr-code/${draft.slug}`}</p>
+          <p className="mt-2 break-all rounded-md bg-white px-3 py-2 text-xs text-indigo-700">{qrUrl || "Loading public park URL…"}</p>
+          {qrUrlError && <p role="alert" className="mt-2 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800">{qrUrlError}</p>}
           <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">
-            <button type="button" onClick={downloadQr} disabled={!baseUrl} className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60">⬇️ Download QR</button>
-            <a href={`/qr-code/${draft.slug}`} target="_blank" rel="noreferrer" className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">👁️ Preview guest first screen</a>
+            <button type="button" onClick={downloadQr} disabled={!qrImageUrl} className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60">⬇️ Download QR</button>
+            {qrUrl && <a href={qrUrl} target="_blank" rel="noreferrer" className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">👁️ Preview guest first screen</a>}
           </div>
           <p className="mt-2 text-xs text-slate-500">Save your park changes to update the content guests see after scanning.</p>
         </div>
