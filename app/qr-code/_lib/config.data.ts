@@ -65,10 +65,64 @@ const slugify = (s: string) =>
 /* Per-city hero image (used as each park's map image by default). */
 const PARK_HERO: Record<string, string> = {
   bengaluru: "/wonderla/parks/bengaluru-layout.jpg",
+  kochi: "/wonderla/parks/kochi-layout.jpg",
+  hyderabad: "/wonderla/parks/hyderabad-layout.jpg",
+  bhubaneswar: "/wonderla/parks/bhubaneswar.png",
+  chennai: "/wonderla/parks/chennai-layout.jpg",
+};
+
+/* Keep the original city artwork on the landing screen. */
+export const PARK_LANDING_HERO: Record<string, string> = {
+  bengaluru: "/wonderla/parks/bengaluru.png",
   kochi: "/wonderla/parks/kochi.png",
   hyderabad: "/wonderla/parks/hyderabad.png",
   bhubaneswar: "/wonderla/parks/bhubaneswar.png",
   chennai: "/wonderla/parks/chennai.png",
+};
+
+const PARK_MAP_PLACES: Record<string, ParkConfig["parkMap"]["places"]> = {
+  hyderabad: [
+    { name: "Entrance / Exit", category: "Entrance", x: 83, y: 29 },
+    { name: "Mission Interstellar", category: "Ride", x: 29, y: 13 },
+    { name: "Maverick", category: "Ride", x: 58, y: 17 },
+    { name: "Sky Wheel", category: "Ride", x: 48, y: 23 },
+    { name: "Kiddies Wheel", category: "Kids ride", x: 49, y: 31 },
+    { name: "Recoil", category: "Ride", x: 32, y: 37 },
+    { name: "Wonderla Bamba", category: "Ride", x: 19, y: 40 },
+    { name: "Wave Pool", category: "Water ride", x: 25, y: 78 },
+    { name: "Lazy River", category: "Water ride", x: 45, y: 75 },
+    { name: "Boomerang", category: "Water ride", x: 59, y: 59 },
+    { name: "Harakiri", category: "Water ride", x: 60, y: 65 },
+    { name: "First Aid", category: "Facility", x: 58, y: 94 },
+  ],
+  chennai: [
+    { name: "Entrance / Exit", category: "Entrance", x: 83, y: 46 },
+    { name: "Maverick", category: "Ride", x: 67, y: 27 },
+    { name: "G-Fall", category: "Ride", x: 56, y: 33 },
+    { name: "Freestyler", category: "Ride", x: 49, y: 31 },
+    { name: "Drop Zone", category: "Ride", x: 36, y: 28 },
+    { name: "Techno Jump", category: "Ride", x: 31, y: 10 },
+    { name: "Sky Wheel", category: "Ride", x: 45, y: 33 },
+    { name: "Crazy Cars", category: "Family ride", x: 27, y: 39 },
+    { name: "Wave Pool", category: "Water ride", x: 45, y: 60 },
+    { name: "Rain Disco", category: "Water ride", x: 28, y: 54 },
+    { name: "Drop Loop", category: "Water ride", x: 14, y: 63 },
+    { name: "First Aid", category: "Facility", x: 31, y: 44 },
+  ],
+  kochi: [
+    { name: "Entrance / Exit", category: "Entrance", x: 13, y: 30 },
+    { name: "Chikku", category: "Family ride", x: 26, y: 44 },
+    { name: "Recoil", category: "Ride", x: 58, y: 18 },
+    { name: "Techno Jump", category: "Ride", x: 64, y: 35 },
+    { name: "Crazy Cars", category: "Family ride", x: 39, y: 33 },
+    { name: "Carousel", category: "Kids ride", x: 51, y: 25 },
+    { name: "Wave Pool", category: "Water ride", x: 47, y: 50 },
+    { name: "Jungle Lagoon", category: "Water ride", x: 66, y: 53 },
+    { name: "Boomerang", category: "Water ride", x: 75, y: 62 },
+    { name: "Uphill Racers", category: "Water ride", x: 23, y: 71 },
+    { name: "Rain Disco", category: "Water ride", x: 41, y: 61 },
+    { name: "First Aid", category: "Facility", x: 60, y: 40 },
+  ],
 };
 
 export function createDefaultParkConfig(
@@ -83,6 +137,7 @@ export function createDefaultParkConfig(
     location,
     active: true,
     logoUrl: "/wonderla/logo.png",
+    heroImageUrl: PARK_LANDING_HERO[_slug] || "",
     landingIcons: { ...DEFAULT_LANDING_ICONS },
 
     rides: [
@@ -163,7 +218,7 @@ export function createDefaultParkConfig(
         { name: "Boomerang", category: "Water rides", x: 58, y: 58 },
         { name: "First Aid", category: "Facility", x: 48, y: 37 },
         { name: "Dome Plaza", category: "Attraction", x: 31, y: 29 },
-      ] } : {}),
+      ] } : PARK_MAP_PLACES[_slug] ? { places: PARK_MAP_PLACES[_slug] } : {}),
     },
 
     dining: [

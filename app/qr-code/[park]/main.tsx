@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import LandingStep from "../_components/LandingStep";
 import ParkMapStep from "../_components/ParkMapStep";
-import { steps, StepValue } from "../_lib/config.data";
+import { PARK_LANDING_HERO, steps, StepValue } from "../_lib/config.data";
 import type { ParkConfig } from "../_lib/types";
 import RideEventDetailStep from "../_components/RideEventDetailStep";
 import DiningMenuStep from "../_components/DiningMenuStep";
@@ -67,7 +67,7 @@ const QrCodeMain = ({ initialConfig }: Props) => {
             parkName={config.name}
             logoUrl={config.logoUrl}
             icons={config.landingIcons}
-            heroImage={config.heroImageUrl || (config.slug === "bengaluru" ? "/wonderla/parks/bengaluru.png" : config.parkMap?.img)}
+            heroImage={config.heroImageUrl || PARK_LANDING_HERO[config.slug] || config.parkMap?.img}
           />
         );
       case steps.PARK_MAP:

@@ -107,7 +107,7 @@ export default function InteractiveParkMap({ image, places, parkName }: { image:
     return () => navigator.geolocation.clearWatch(watchId);
   }, [tracking, start]);
 
-  if (!validPlaces.length) return <div className="rounded-2xl bg-white p-4 text-sm text-slate-600">This park map has no navigation destinations yet. Ask an admin to add map pins.</div>;
+  if (!validPlaces.length) return <section className="overflow-hidden rounded-2xl bg-white shadow-lg"><div className="border-b border-slate-100 px-4 py-3"><h2 className="font-bold text-slate-800">{parkName} park map</h2><p className="text-xs text-slate-500">Explore the park layout and facility guide.</p></div><div className="flex max-h-[75vh] min-h-[340px] items-center justify-center overflow-auto bg-slate-100 p-2"><img src={image} alt={`${parkName} park map and facilities`} className="max-h-[72vh] max-w-full object-contain" /></div></section>;
 
   return <section className="overflow-hidden rounded-2xl bg-white shadow-lg">
     <div className="space-y-3 p-4">
