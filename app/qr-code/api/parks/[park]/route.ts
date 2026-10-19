@@ -6,22 +6,24 @@ import type { ParkConfig } from "../../../_lib/types";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type Ctx = { params: { park: string } };
+type Ctx = { params: Promise<{ park: string }> };
 
 // Public: read one park's full config
 export async function GET(_req: NextRequest, { params }: Ctx) {
-  const cfg = await getPark(params.park);
+  const { park } = await params;
+  const cfg = await getPark(park);
   if (!cfg) return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
   return NextResponse.json({ ok: true, config: cfg }, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 // Superadmin (any park) or park user (own park): update config
 export async function PUT(req: NextRequest, { params }: Ctx) {
+  const { park } = await params;
   const session = sessionFromRequest(req);
-  if (!canEditPark(session, params.park)) {
+  if (!canEditPark(session, park)) {
     return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
   }
-  const existing = await getPark(params.park);
+  const existing = await getPark(park);
   if (!existing) return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
 
   let body: Partial<ParkConfig>;
@@ -36,16 +38,22 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
   const merged: ParkConfig = { ...existing, ...body, slug: existing.slug };
   if (!isSuperadmin(session)) merged.active = existing.active;
 
-  const saved = await savePark(merged);
-  return NextResponse.json({ ok: true, config: saved });
+  try {
+    const saved = await savePark(merged);
+    return NextResponse.json({ ok: true, config: saved });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Could not save park changes.";
+    return NextResponse.json({ ok: false, error: message }, { status: 503 });
+  }
 }
 
 // Superadmin only: delete a park
 export async function DELETE(req: NextRequest, { params }: Ctx) {
+  const { park } = await params;
   if (!isSuperadmin(sessionFromRequest(req))) {
     return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
   }
-  const ok = await deletePark(params.park);
+  const ok = await deletePark(park);
   if (!ok) return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
   return NextResponse.json({ ok: true });
 }

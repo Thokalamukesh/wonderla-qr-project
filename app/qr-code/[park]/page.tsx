@@ -5,11 +5,12 @@ import QrCodeMain from "./main";
 
 export const dynamic = "force-dynamic";
 
-type Props = { params: { park: string } };
+type Props = { params: Promise<{ park: string }> };
 
 /** Server component: loads the park's config, hands it to the client UI. */
 const ParkPage = async ({ params }: Props) => {
-  const config = await getPark(params.park);
+  const { park } = await params;
+  const config = await getPark(park);
   if (!config || !config.active) notFound();
   return <QrCodeMain initialConfig={config} />;
 };

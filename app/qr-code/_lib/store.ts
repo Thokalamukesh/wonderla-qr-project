@@ -6,14 +6,14 @@
      this into a client component.
 ============================================================ */
 
-import { promises as fs } from "fs";
 import path from "path";
 import { PARKS_DIR } from "./paths";
 import { createBlankParkConfig, createDefaultParkConfig, SEED_PARKS, slugify } from "./config.data";
+import { deleteStoredKey, hasVercelBlob, isVercelRuntime, listStoredKeys, readStoredText, writeStoredText } from "./persistent-storage";
 import type { ParkConfig, ParkSummary } from "./types";
 
 async function ensureDir() {
-  await fs.mkdir(PARKS_DIR, { recursive: true });
+  if (!isVercelRuntime) await (await import("fs/promises")).mkdir(PARKS_DIR, { recursive: true });
 }
 
 function fileFor(slug: string) {
@@ -21,25 +21,21 @@ function fileFor(slug: string) {
 }
 
 async function exists(p: string): Promise<boolean> {
-  try {
-    await fs.access(p);
-    return true;
-  } catch {
-    return false;
-  }
+  return Boolean(await readStoredText(`qr-code/parks/${path.basename(p)}`, p));
 }
 
 /** Seed the initial parks exactly once (only if the folder is empty). */
 async function ensureSeeded() {
   await ensureDir();
-  const entries = (await fs.readdir(PARKS_DIR)).filter((f) => f.endsWith(".json"));
+  const entries = await listStoredKeys("qr-code/parks/", PARKS_DIR);
   if (entries.length > 0) return;
+  if (isVercelRuntime && !hasVercelBlob) return;
   await Promise.all(
     SEED_PARKS.map((p) =>
-      fs.writeFile(
+      writeStoredText(
+        `qr-code/parks/${p.slug}.json`,
         fileFor(p.slug),
-        JSON.stringify(createDefaultParkConfig(p.name, p.location, p.slug), null, 2),
-        "utf8"
+        JSON.stringify(createDefaultParkConfig(p.name, p.location, p.slug), null, 2)
       )
     )
   );
@@ -47,10 +43,17 @@ async function ensureSeeded() {
 
 export async function listParks(): Promise<ParkSummary[]> {
   await ensureSeeded();
-  const files = (await fs.readdir(PARKS_DIR)).filter((f) => f.endsWith(".json"));
-  const parks = (await Promise.all(files.map(async (f): Promise<ParkSummary | null> => {
+  const files = await listStoredKeys("qr-code/parks/", PARKS_DIR);
+  if (isVercelRuntime && !hasVercelBlob) {
+    return SEED_PARKS.map((seed) => {
+      const config = createDefaultParkConfig(seed.name, seed.location, seed.slug);
+      return { slug: config.slug, name: config.name, location: config.location, active: config.active, updatedAt: config.updatedAt };
+    }).sort((a, b) => a.name.localeCompare(b.name));
+  }
+  const parks = (await Promise.all(files.map(async (file): Promise<ParkSummary | null> => {
     try {
-      const raw = await fs.readFile(path.join(PARKS_DIR, f), "utf8");
+      const raw = await readStoredText(isVercelRuntime ? file : `qr-code/parks/${path.basename(file)}`, isVercelRuntime ? fileFor(path.basename(file)) : file);
+      if (!raw) return null;
       const cfg = JSON.parse(raw) as ParkConfig;
       return {
         slug: cfg.slug,
@@ -69,21 +72,19 @@ export async function listParks(): Promise<ParkSummary[]> {
 
 export async function getPark(slug: string): Promise<ParkConfig | null> {
   await ensureSeeded();
-  try {
-    return JSON.parse(await fs.readFile(fileFor(slug), "utf8")) as ParkConfig;
-  } catch {
-    return null;
+  const raw = await readStoredText(`qr-code/parks/${slug}.json`, fileFor(slug));
+  if (raw) return JSON.parse(raw) as ParkConfig;
+  if (isVercelRuntime && !hasVercelBlob) {
+    const seed = SEED_PARKS.find((park) => park.slug === slug);
+    return seed ? createDefaultParkConfig(seed.name, seed.location, seed.slug) : null;
   }
+  return null;
 }
 
 export async function savePark(config: ParkConfig): Promise<ParkConfig> {
-  await ensureDir();
   if (!config.slug) throw new Error("Park slug is required");
   const next: ParkConfig = { ...config, updatedAt: new Date().toISOString() };
-  const target = fileFor(next.slug);
-  const temporary = `${target}.${process.pid}.${Date.now()}.tmp`;
-  await fs.writeFile(temporary, JSON.stringify(next, null, 2), { encoding: "utf8", flag: "wx" });
-  await fs.rename(temporary, target);
+  await writeStoredText(`qr-code/parks/${next.slug}.json`, fileFor(next.slug), JSON.stringify(next, null, 2));
   return next;
 }
 
@@ -95,7 +96,7 @@ export async function createPark(
   await ensureSeeded();
   const slug = slugify(rawSlug || name);
   if (!slug) throw new Error("A valid name or slug is required");
-  if (await exists(fileFor(slug))) {
+  if (await getPark(slug) || await exists(fileFor(slug))) {
     throw new Error(`A park with slug "${slug}" already exists`);
   }
   const cfg = createBlankParkConfig(name, location, slug);
@@ -104,7 +105,5 @@ export async function createPark(
 
 export async function deletePark(slug: string): Promise<boolean> {
   const p = fileFor(slug);
-  if (!(await exists(p))) return false;
-  await fs.unlink(p);
-  return true;
+  return deleteStoredKey(`qr-code/parks/${slug}.json`, p);
 }

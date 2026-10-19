@@ -8,10 +8,10 @@
    yourself out.
 ============================================================ */
 
-import { promises as fs } from "fs";
 import path from "path";
 import crypto from "crypto";
 import { DATA_DIR } from "./paths";
+import { hasVercelBlob, isVercelRuntime, readStoredText, writeStoredText } from "./persistent-storage";
 import type { Role, Session } from "./auth";
 
 const USERS_FILE = path.join(DATA_DIR, "users.json");
@@ -56,25 +56,23 @@ function makeUser(
 }
 
 async function readAll(): Promise<StoredUser[]> {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  try {
-    const raw = await fs.readFile(USERS_FILE, "utf8");
+  const raw = await readStoredText("qr-code/users.json", USERS_FILE);
+  if (raw) {
     const arr = JSON.parse(raw);
     if (Array.isArray(arr) && arr.length) return arr as StoredUser[];
-  } catch {
-    /* fall through to seed */
   }
   // Seed one superadmin from env on first run.
   const u = process.env.QR_ADMIN_USERNAME || "admin";
   const p = process.env.QR_ADMIN_PASSWORD || "wonderla@admin";
   const seeded = [makeUser(u, p, "superadmin")];
-  await fs.writeFile(USERS_FILE, JSON.stringify(seeded, null, 2), "utf8");
+  if (!isVercelRuntime || hasVercelBlob) {
+    await writeStoredText("qr-code/users.json", USERS_FILE, JSON.stringify(seeded, null, 2));
+  }
   return seeded;
 }
 
 async function writeAll(users: StoredUser[]): Promise<void> {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2), "utf8");
+  await writeStoredText("qr-code/users.json", USERS_FILE, JSON.stringify(users, null, 2));
 }
 
 function toPublic(u: StoredUser): PublicUser {
