@@ -5,7 +5,8 @@ import path from "path";
 export const isVercelRuntime = process.env.VERCEL === "1";
 export const hasVercelBlob = Boolean(
   process.env.BLOB_READ_WRITE_TOKEN ||
-  (process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN)
+  // Vercel Functions receive OIDC per request; the token is not a runtime env var.
+  (process.env.BLOB_STORE_ID && (isVercelRuntime || process.env.VERCEL_OIDC_TOKEN))
 );
 
 function requireBlobStore() {
