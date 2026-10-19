@@ -12,7 +12,8 @@ const ParkPage = async ({ params }: Props) => {
   const { park } = await params;
   const config = await getPark(park);
   if (!config || !config.active) notFound();
-  return <QrCodeMain initialConfig={config} />;
+  // Reset guest navigation when changing parks so each park URL opens at its first screen.
+  return <QrCodeMain key={config.slug} initialConfig={config} />;
 };
 
 export default ParkPage;

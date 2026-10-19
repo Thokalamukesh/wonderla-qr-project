@@ -165,11 +165,11 @@ const ParkEditor = ({ config, onSaved, onDeleted, canManagePark = true }: Props)
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="text-base font-bold text-slate-800">📱 QR code for {draft.name}</h3>
-          <p className="mt-1 text-sm text-slate-600">Guests who scan this code see this park’s latest saved map, rides, menus, wait times and information.</p>
+          <p className="mt-1 text-sm text-slate-600">Scanning this code opens {draft.name}’s first guest screen. Guests can then choose the park map, rides, menus, wait times and other information.</p>
           <p className="mt-2 break-all rounded-md bg-white px-3 py-2 text-xs text-indigo-700">{qrUrl || `/qr-code/${draft.slug}`}</p>
           <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">
             <button type="button" onClick={downloadQr} disabled={!baseUrl} className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60">⬇️ Download QR</button>
-            <a href={`/qr-code/${draft.slug}`} target="_blank" rel="noreferrer" className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">👁️ Preview park page</a>
+            <a href={`/qr-code/${draft.slug}`} target="_blank" rel="noreferrer" className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">👁️ Preview guest first screen</a>
           </div>
           <p className="mt-2 text-xs text-slate-500">Save your park changes to update the content guests see after scanning.</p>
         </div>
