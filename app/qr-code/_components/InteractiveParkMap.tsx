@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { MapContainer, Marker, ImageOverlay, Polyline, useMap, useMapEvents } from "react-leaflet";
+import { MapContainer, Marker, ImageOverlay, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import type { ParkMapPlace } from "../_lib/types";
 
@@ -47,7 +47,17 @@ export default function InteractiveParkMap({ image, places, parkName }: { image:
   const destination = destinationIndex === null ? undefined : validPlaces[destinationIndex];
   const direction = useMemo(() => {
     const current = livePosition || start;
-    return current && destination ? [coords(current), coords(destination)] as [number, number][] : [];
+    if (!current || !destination) return null;
+    const dx = destination.x - current.x;
+    const dy = destination.y - current.y;
+    if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return { label: "You’re at your destination", arrow: "✓" };
+    if (Math.abs(dx) > Math.abs(dy) * 1.5) return dx < 0
+      ? { label: "Your destination is to the left", arrow: "←" }
+      : { label: "Your destination is to the right", arrow: "→" };
+    if (Math.abs(dy) > Math.abs(dx) * 1.5) return dy < 0
+      ? { label: "Your destination is ahead on the map", arrow: "↑" }
+      : { label: "Your destination is behind you on the map", arrow: "↓" };
+    return { label: `Your destination is ${dy < 0 ? "ahead" : "behind"} and ${dx < 0 ? "left" : "right"}`, arrow: `${dy < 0 ? "↑" : "↓"}${dx < 0 ? "←" : "→"}` };
   }, [start, livePosition, destination]);
   const googleMapsUrl = destination && gpsCoordinates
     ? `https://www.google.com/maps/dir/?api=1&origin=${gpsCoordinates.latitude},${gpsCoordinates.longitude}&destination=${encodeURIComponent(`${destination.name}, ${parkName}`)}&travelmode=walking&dir_action=navigate`
@@ -134,16 +144,16 @@ export default function InteractiveParkMap({ image, places, parkName }: { image:
         <FollowLocation point={livePosition} enabled={tracking} />
         {destination && <Marker position={coords(destination)} icon={destinationIcon} />}
         {(livePosition || start) && <Marker position={coords(livePosition || start!)} icon={startIcon} />}
-        {direction.length > 0 && <Polyline positions={direction as [number, number][]} pathOptions={{ color: "#4f46e5", weight: 5, dashArray: "8 8", opacity: 0.9 }} />}
       </MapContainer>
       {choosingStart && <div className="pointer-events-none absolute inset-x-3 top-3 z-[500] rounded-xl bg-emerald-800/95 px-4 py-3 text-center text-sm font-bold text-white shadow">Tap the map where you are standing</div>}
       <div className="absolute bottom-3 left-3 z-[400] rounded-lg bg-white/95 px-3 py-2 text-[11px] font-semibold text-slate-600 shadow">🟢 You · ⭐ Destination · Use + / − to zoom</div>
     </div>
     <div className="p-4">
       {destination && <p className="font-semibold text-slate-800">{start ? <>Direction guide to <span className="text-indigo-700">{destination.name}</span></> : <>Selected: <span className="text-indigo-700">{destination.name}</span></>}</p>}
+      {direction && <div role="status" aria-live="polite" className="mt-3 flex items-center gap-3 rounded-xl border border-indigo-100 bg-indigo-50 p-4"><span aria-hidden="true" className="flex size-12 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-3xl font-bold text-white">{direction.arrow}</span><div><p className="text-xs font-semibold uppercase tracking-wide text-indigo-700">Next direction</p><p className="text-base font-extrabold text-slate-900">{direction.label}</p><p className="text-xs text-slate-600">Toward {destination?.name}</p></div></div>}
       {gpsMessage && <p role="status" aria-live="polite" className="mt-2 text-xs text-slate-600">{gpsMessage}</p>}
       {googleMapsUrl && <a href={googleMapsUrl} target="_blank" rel="noreferrer" className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-[#1a73e8] px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#1558b0]">🧭 Continue turn-by-turn in Google Maps <span aria-hidden="true">↗</span></a>}
-      <p className="mt-2 text-xs leading-relaxed text-slate-500">Allow location access when asked. Keep this page open for live updates. GPS may drift indoors; the floor plan is not GPS-calibrated, and the dashed line is a direction guide rather than a verified walking route.</p>
+      <p className="mt-2 text-xs leading-relaxed text-slate-500">Allow location access when asked. Keep this page open for live updates. GPS may drift indoors; direction cues use the selected map pins and are not a mapped walking route.</p>
       {googleMapsUrl && <p className="mt-2 text-[11px] leading-relaxed text-slate-500">Google Maps opens on your device for live navigation. It may find the park or nearest matching attraction; turn-by-turn directions inside Wonderla depend on Google’s mapped paths and place data.</p>}
     </div>
   </section>;

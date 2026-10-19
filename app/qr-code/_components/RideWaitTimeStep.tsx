@@ -3,6 +3,7 @@ import React from "react";
 import { steps, StepValue } from "../_lib/config.data";
 import type { WaitTimeItem } from "../_lib/types";
 import Header from "./_shared/Header";
+import KioskBookingCallout from "./_shared/KioskBookingCallout";
 
 interface Props {
   updateStep: (step: StepValue) => void;
@@ -14,48 +15,34 @@ interface Props {
 
 const RefreshButton = ({ onRefresh, refreshing }: { onRefresh?: () => void; refreshing?: boolean }) => (
   <button type="button" onClick={onRefresh} disabled={refreshing} className="flex flex-col items-center gap-1 disabled:opacity-60">
-    <span className={`flex size-9 items-center justify-center rounded-full bg-yellow text-lg ${refreshing ? "animate-spin" : ""}`}>↻</span>
+    <span className={`flex size-9 items-center justify-center rounded-full bg-yellow text-lg ${refreshing ? "animate-spin" : ""}`}>â†»</span>
     <span className="font-mulish text-[11px] font-bold text-white">{refreshing ? "..." : "Refresh"}</span>
   </button>
 );
 
 const RideWaitTimeStep = ({ updateStep, data, onRefresh, refreshing, refreshError }: Props) => (
   <div className="min-h-screen bg-blue">
-    <Header
-      title="Live Ride Wait Time"
-      onBack={() => updateStep(steps.LANDING)}
-      right={<RefreshButton onRefresh={onRefresh} refreshing={refreshing} />}
-    />
+    <Header title="Live Ride Wait Time" onBack={() => updateStep(steps.LANDING)} right={<RefreshButton onRefresh={onRefresh} refreshing={refreshing} />} />
     {refreshError && <p role="status" className="px-4 pt-3 text-center font-mulish text-xs text-white">Could not refresh. Check your connection and try again.</p>}
     <div className="flex flex-col gap-3 px-4 py-5">
       {(data ?? []).map((item, i) => (
-        <div key={`${item.title}-${i}`} className="flex items-center gap-3 rounded-2xl bg-white p-3 shadow-[0_6px_18px_rgba(0,0,0,0.12)]">
-          {item.img ? (
-            <img src={item.img} alt={item.title} className="size-[84px] shrink-0 rounded-xl object-cover" />
-          ) : (
-            <div className="flex size-[84px] shrink-0 items-center justify-center rounded-xl bg-yellow text-3xl">🎢</div>
-          )}
-          <div className="min-w-0 flex-1">
-            <h3 className="font-anton text-lg uppercase tracking-tight text-[#0F1C3F]">{item.title}</h3>
-            <p className="font-mulish text-xs text-[#0F1C3F]/70">{item.description}</p>
-            {item.kioskBookingEnabled && item.kioskBookingMessage && (
-              <div className="mt-2 flex items-start gap-2 rounded-xl border border-violet-100 bg-violet-50 px-2.5 py-2">
-                <span aria-hidden="true" className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-violet-100 text-[10px]">K</span>
-                <div>
-                  <p className="font-mulish text-[9px] font-extrabold uppercase tracking-wider text-violet-700">Book at a kiosk</p>
-                  <p className="mt-0.5 font-mulish text-xs leading-relaxed text-violet-950">{item.kioskBookingMessage}</p>
-                </div>
-              </div>
+        <article key={`${item.title}-${i}`} className="rounded-2xl bg-white p-3 shadow-[0_6px_18px_rgba(0,0,0,0.12)]">
+          <div className="flex items-start gap-3">
+            {item.img ? (
+              <img src={item.img} alt={item.title} className="size-[76px] shrink-0 rounded-xl object-cover" />
+            ) : (
+              <div className="flex size-[76px] shrink-0 items-center justify-center rounded-xl bg-yellow text-3xl">ðŸŽ¢</div>
             )}
+            <div className="min-w-0 flex-1">
+              <h3 className="font-anton text-lg uppercase tracking-tight text-[#0F1C3F]">{item.title}</h3>
+              <p className="font-mulish text-xs text-[#0F1C3F]/70">{item.description}</p>
+            </div>
+            <span className={`shrink-0 rounded-full px-3 py-1 font-mulish text-xs font-bold text-white ${item.time >= 20 ? "bg-[#E14F1B]" : item.time >= 10 ? "bg-blue" : "bg-[#0B8043]"}`}>
+              {item.time} min
+            </span>
           </div>
-          <span
-            className={`shrink-0 rounded-full px-3 py-1 font-mulish text-xs font-bold text-white ${
-              item.time >= 20 ? "bg-[#E14F1B]" : item.time >= 10 ? "bg-blue" : "bg-[#0B8043]"
-            }`}
-          >
-            {item.time} min
-          </span>
-        </div>
+          {item.kioskBookingEnabled && <KioskBookingCallout />}
+        </article>
       ))}
     </div>
   </div>

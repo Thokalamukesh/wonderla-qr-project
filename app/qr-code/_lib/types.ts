@@ -11,7 +11,6 @@ export interface MediaItem {
   description: string;
   tags?: string[]; // short category chips, e.g. ["Space Theme", "4K Clarity"]
   kioskBookingEnabled?: boolean;
-  kioskBookingMessage?: string;
 }
 
 export interface EventItem extends MediaItem {

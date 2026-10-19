@@ -20,6 +20,7 @@ export default function ImageField({ label, value, onChange, parkSlug }: { label
       const json = await response.json();
       if (!response.ok || !json.ok) throw new Error(json.error || "Upload failed");
       onChange(json.url);
+      window.alert("Image uploaded successfully");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");
     } finally {
