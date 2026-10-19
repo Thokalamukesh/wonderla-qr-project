@@ -47,6 +47,7 @@ const ParkEditor = ({ config, onSaved, onDeleted, canManagePark = true }: Props)
   const [msg, setMsg] = useState<string | null>(null);
   const [baseUrl, setBaseUrl] = useState("");
   const [qrImageUrl, setQrImageUrl] = useState("");
+  const [pinPlacementIndex, setPinPlacementIndex] = useState<number | null>(null);
 
   useEffect(() => {
     setBaseUrl(window.location.origin);
@@ -323,17 +324,40 @@ const ParkEditor = ({ config, onSaved, onDeleted, canManagePark = true }: Props)
         </div>
         <div className="mt-5 rounded-xl border border-indigo-100 bg-indigo-50/50 p-3">
           <div className="mb-2 flex items-center justify-between gap-2">
-            <div><h4 className="text-xs font-bold text-slate-700">📍 Map destinations</h4><p className="mt-1 text-[11px] text-slate-500">Set image coordinates as percentages from the top-left corner (0–100).</p></div>
-            <button type="button" className="shrink-0 rounded-md bg-white px-3 py-2 text-xs font-semibold text-indigo-700 shadow-sm" onClick={() => setField("parkMap", { ...draft.parkMap, places: [...(draft.parkMap.places || []), { name: "", category: "Attraction", x: 50, y: 50 }] })}>+ Add pin</button>
+            <div><h4 className="text-xs font-bold text-slate-700">📍 Map destinations</h4><p className="mt-1 text-[11px] text-slate-500">Add a destination, then place its pin by clicking the map below.</p></div>
+            <button type="button" className="shrink-0 rounded-md bg-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700" onClick={() => {
+              const places = [...(draft.parkMap.places || []), { name: "", category: "Attraction", x: 50, y: 50 }];
+              setField("parkMap", { ...draft.parkMap, places });
+              setPinPlacementIndex(places.length - 1);
+            }}>+ Add destination</button>
           </div>
-          {(draft.parkMap.places || []).map((place, i) => <Row key={`${place.name}-${i}`} onRemove={() => setField("parkMap", { ...draft.parkMap, places: draft.parkMap.places?.filter((_, index) => index !== i) || [] })}>
-            <Text label="Destination name" value={place.name} onChange={(v) => { const places = [...(draft.parkMap.places || [])]; places[i] = { ...places[i], name: v }; setField("parkMap", { ...draft.parkMap, places }); }} />
-            <div className="grid grid-cols-3 gap-2">
+          {(draft.parkMap.places || []).map((place, i) => <Row key={`${place.name}-${i}`} onRemove={() => { setField("parkMap", { ...draft.parkMap, places: draft.parkMap.places?.filter((_, index) => index !== i) || [] }); setPinPlacementIndex(null); }}>
+            <div className={`grid gap-2 rounded-lg p-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end ${pinPlacementIndex === i ? "bg-emerald-50 ring-1 ring-emerald-200" : ""}`}>
+              <Text label="Destination name" value={place.name} onChange={(v) => { const places = [...(draft.parkMap.places || [])]; places[i] = { ...places[i], name: v }; setField("parkMap", { ...draft.parkMap, places }); }} />
               <Text label="Category" value={place.category} onChange={(v) => { const places = [...(draft.parkMap.places || [])]; places[i] = { ...places[i], category: v }; setField("parkMap", { ...draft.parkMap, places }); }} />
-              <Num label="X (%)" value={place.x} onChange={(v) => { const places = [...(draft.parkMap.places || [])]; places[i] = { ...places[i], x: Math.max(0, Math.min(100, v)) }; setField("parkMap", { ...draft.parkMap, places }); }} />
-              <Num label="Y (%)" value={place.y} onChange={(v) => { const places = [...(draft.parkMap.places || [])]; places[i] = { ...places[i], y: Math.max(0, Math.min(100, v)) }; setField("parkMap", { ...draft.parkMap, places }); }} />
+              <button type="button" onClick={() => setPinPlacementIndex(i)} className={`rounded-md px-3 py-2 text-xs font-semibold ${pinPlacementIndex === i ? "bg-emerald-700 text-white" : "bg-white text-indigo-700 shadow-sm hover:bg-indigo-50"}`}>{pinPlacementIndex === i ? "Click the map…" : `📍 Place ${place.name || "pin"}`}</button>
             </div>
+            <p className="mt-2 text-[11px] text-slate-500">Pin position: {Math.round(place.x)}% from left, {Math.round(place.y)}% from top</p>
           </Row>)}
+          {(draft.parkMap.places || []).length > 0 && draft.parkMap.img && <div className="mt-3 overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <div className="border-b border-slate-100 px-3 py-2 text-xs text-slate-600">{pinPlacementIndex !== null ? `Click the map to place ${draft.parkMap.places?.[pinPlacementIndex]?.name || "this pin"}.` : "Choose Place pin, then click the map to position it."}</div>
+            <div className={`relative ${pinPlacementIndex !== null ? "cursor-crosshair" : "cursor-default"}`} onClick={(event) => {
+              if (pinPlacementIndex === null) return;
+              const bounds = event.currentTarget.getBoundingClientRect();
+              const x = Math.max(0, Math.min(100, ((event.clientX - bounds.left) / bounds.width) * 100));
+              const y = Math.max(0, Math.min(100, ((event.clientY - bounds.top) / bounds.height) * 100));
+              const places = [...(draft.parkMap.places || [])];
+              const place = places[pinPlacementIndex];
+              if (!place) return;
+              places[pinPlacementIndex] = { ...place, x, y };
+              setField("parkMap", { ...draft.parkMap, places });
+              setPinPlacementIndex(null);
+            }}>
+              <img src={draft.parkMap.img} alt="Click the map to place destination pins" className="block h-auto w-full select-none" draggable={false} />
+              {(draft.parkMap.places || []).map((place, i) => <span key={`${place.name}-${i}`} className={`pointer-events-none absolute flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white text-xs font-bold text-white shadow ${pinPlacementIndex === i ? "bg-emerald-600 ring-4 ring-emerald-300/70" : "bg-indigo-600"}`} style={{ left: `${place.x}%`, top: `${place.y}%` }} title={place.name}>{i + 1}</span>)}
+            </div>
+          </div>}
+          {(draft.parkMap.places || []).length > 0 && !draft.parkMap.img && <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">Add the park map image above to place destinations visually.</p>}
         </div>
       </Section>
 

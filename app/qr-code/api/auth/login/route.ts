@@ -6,6 +6,17 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
+  if (process.env.VERCEL === "1") {
+    const missing = ["QR_ADMIN_USERNAME", "QR_ADMIN_PASSWORD", "QR_ADMIN_SECRET"]
+      .filter((name) => !process.env[name]?.trim());
+    if (missing.length) {
+      return NextResponse.json({
+        ok: false,
+        error: `Admin login is not configured on Vercel. Add ${missing.join(", ")} in Project Settings → Environment Variables, then redeploy.`,
+      }, { status: 503 });
+    }
+  }
+
   let body: { username?: string; password?: string };
   try {
     body = await req.json();

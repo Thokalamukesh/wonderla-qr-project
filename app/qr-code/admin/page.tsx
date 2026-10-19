@@ -39,7 +39,7 @@ const AdminPage = () => {
   return user ? (
     <Dashboard user={user} onLogout={() => setUser(null)} />
   ) : (
-    <LoginForm onSuccess={check} />
+    <LoginForm onSuccess={setUser} />
   );
 };
 

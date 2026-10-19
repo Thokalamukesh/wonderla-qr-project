@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 
 interface Props {
-  onSuccess: () => void;
+  onSuccess: (user: { username: string; role: "superadmin" | "park"; parkSlug?: string }) => void;
 }
 
 const LoginForm = ({ onSuccess }: Props) => {
@@ -23,10 +23,12 @@ const LoginForm = ({ onSuccess }: Props) => {
       });
       const json = await res.json();
       if (!res.ok || !json.ok) {
-        setError(json.error || "Login failed");
+        setError(res.status === 401
+          ? "Invalid credentials for this deployment. On Vercel, check QR_ADMIN_USERNAME and QR_ADMIN_PASSWORD under Project Settings → Environment Variables, then redeploy. .env.local is only used on your computer."
+          : json.error || "Login failed");
         return;
       }
-      onSuccess();
+      onSuccess(json.user);
     } catch {
       setError("Network error");
     } finally {
@@ -59,7 +61,7 @@ const LoginForm = ({ onSuccess }: Props) => {
           required
         />
 
-        {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+        {error && <p role="alert" className="mb-4 text-sm leading-relaxed text-red-600">{error}</p>}
 
         <button
           type="submit"

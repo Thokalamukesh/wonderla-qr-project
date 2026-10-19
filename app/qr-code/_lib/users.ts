@@ -84,8 +84,10 @@ export async function verifyCredentials(
   username: string,
   password: string
 ): Promise<Session | null> {
-  const envU = process.env.QR_ADMIN_USERNAME || "admin";
-  const envP = process.env.QR_ADMIN_PASSWORD || "wonderla@admin";
+  // Remove accidental spaces copied into the username or deployment secret UI.
+  username = username.trim();
+  const envU = (process.env.QR_ADMIN_USERNAME || "admin").trim();
+  const envP = (process.env.QR_ADMIN_PASSWORD || "wonderla@admin").trim();
   if (username === envU && password === envP) {
     return { username, role: "superadmin" };
   }
