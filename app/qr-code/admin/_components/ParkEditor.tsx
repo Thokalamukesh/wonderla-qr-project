@@ -152,15 +152,15 @@ const ParkEditor = ({ config, onSaved, onDeleted, canManagePark = true }: Props)
 
   return (
     <div>
-      <div className="sticky top-0 z-10 mb-4 flex items-center justify-between rounded-lg border border-slate-200 bg-white/95 p-4 backdrop-blur">
-        <div>
-          <h2 className="text-lg font-bold text-slate-800">{draft.name}</h2>
-          <p className="text-xs text-slate-500">
+      <div className="sticky top-0 z-10 mb-4 flex flex-col gap-3 rounded-lg border border-slate-200 bg-white/95 p-3 backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:p-4">
+        <div className="min-w-0">
+          <h2 className="break-words text-lg font-bold text-slate-800">{draft.name}</h2>
+          <p className="break-all text-xs text-slate-500">
             slug: <code>{draft.slug}</code> · QR URL:{" "}
             <code>/qr-code/{draft.slug}</code>
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 sm:justify-end sm:gap-3">
           {msg && <span className="text-xs font-semibold text-slate-600">{msg}</span>}
           {canManagePark && (
             <button
@@ -213,7 +213,7 @@ const ParkEditor = ({ config, onSaved, onDeleted, canManagePark = true }: Props)
       <nav aria-label="Park content sections" className="mb-6 rounded-xl border border-slate-200 bg-white p-4">
         <h3 className="mb-1 text-sm font-bold text-slate-800">🗂️ Park content</h3>
         <p className="mb-3 text-xs text-slate-500">Choose one section to edit. Other sections stay out of the way.</p>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-2 min-[380px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
           {EDITOR_SECTIONS.map(([icon, title, description]) => (
             <button key={title} type="button" aria-pressed={activeSection === title} onClick={() => setActiveSection(title)} className={`flex min-h-14 items-center gap-2 rounded-lg border p-2.5 text-left transition ${activeSection === title ? "border-indigo-500 bg-indigo-50 ring-1 ring-indigo-200" : "border-slate-200 bg-slate-50 hover:border-indigo-200 hover:bg-indigo-50"}`}>
               <span className="text-lg" aria-hidden="true">{icon}</span>
@@ -544,7 +544,7 @@ const ParkEditor = ({ config, onSaved, onDeleted, canManagePark = true }: Props)
               </div>
               {o.items.map((it, j) => (
                 <div key={j} className="mb-2 rounded-md border border-slate-200 bg-slate-50 p-2">
-                  <div className="grid grid-cols-[1fr_90px_60px_auto] items-center gap-2">
+                  <div className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[minmax(0,1fr)_90px_60px_auto]">
                     <input
                       className="rounded-md border border-slate-300 px-2 py-1 text-sm"
                       placeholder="Item name"

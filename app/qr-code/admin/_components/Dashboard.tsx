@@ -96,9 +96,9 @@ const Dashboard = ({ user, onLogout }: Props) => {
 
   return (
     <div className="min-h-screen bg-slate-100">
-      <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
-        <div className="flex items-center gap-4">
-          <h1 className="text-lg font-bold text-slate-800">Wonderla QR Admin</h1>
+      <header className="flex flex-col gap-3 border-b border-slate-200 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4">
+        <div className="flex min-w-0 flex-wrap items-center justify-between gap-3 sm:justify-start sm:gap-4">
+          <h1 className="text-base font-bold text-slate-800 sm:text-lg">Wonderla QR Admin</h1>
           {isSuper && (
             <nav className="flex gap-1 rounded-lg bg-slate-100 p-1">
               {(["parks", "users"] as const).map((v) => (
@@ -115,8 +115,8 @@ const Dashboard = ({ user, onLogout }: Props) => {
             </nav>
           )}
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-500">
+        <div className="flex items-center justify-between gap-3 sm:justify-end">
+          <span className="min-w-0 truncate text-xs text-slate-500">
             {user.username}
             <span
               className={`ml-2 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
@@ -144,16 +144,16 @@ const Dashboard = ({ user, onLogout }: Props) => {
 
       {/* Parks view (superadmin) OR single-park editor (park user) */}
       {(!isSuper || view === "parks") && (
-        <div className="mx-auto flex max-w-6xl gap-6 p-6">
+          <div className="mx-auto flex max-w-6xl flex-col gap-4 p-3 sm:gap-6 sm:p-6 lg:flex-row">
           {isSuper && (
-            <aside className="w-64 shrink-0">
+            <aside className="w-full min-w-0 shrink-0 lg:w-64">
               <div className="mb-4 rounded-lg border border-slate-200 bg-white p-3">
                 <p className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
                   Parks
                 </p>
-                <ul className="space-y-1">
+                <ul className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible">
                   {parks.map((p) => (
-                    <li key={p.slug}>
+                    <li key={p.slug} className="min-w-40 flex-1 lg:min-w-0">
                       <button
                         onClick={() => loadConfig(p.slug)}
                         className={`w-full rounded-md px-3 py-2 text-left text-sm ${

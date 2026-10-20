@@ -85,9 +85,10 @@ const UsersPanel = ({ currentUsername }: { currentUsername: string }) => {
   return (
     <div className="grid gap-6 md:grid-cols-[1fr_320px]">
       {/* Existing users */}
-      <section className="rounded-lg border border-slate-200 bg-white p-4">
+      <section className="min-w-0 rounded-lg border border-slate-200 bg-white p-3 sm:p-4">
         <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-700">Users</h3>
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[480px] text-sm">
           <thead>
             <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
               <th className="py-2">Username</th>
@@ -135,6 +136,7 @@ const UsersPanel = ({ currentUsername }: { currentUsername: string }) => {
             )}
           </tbody>
         </table>
+        </div>
       </section>
 
       {/* Create user */}
