@@ -22,7 +22,33 @@ const QrCodeMain = ({ initialConfig }: Props) => {
   const [refreshing, setRefreshing] = useState(false);
   const [refreshError, setRefreshError] = useState(false);
 
-  const updateStep = (next: StepValue) => setStep(next);
+  const updateStep = (next: StepValue) => {
+    if (next === step) return;
+
+    // Keep the in-app sections in browser history so browser and phone back
+    // controls work the same way as the visible page back button.
+    if (next === steps.LANDING) {
+      if (window.history.state?.wonderlaStep) {
+        window.history.back();
+      } else {
+        setStep(next);
+      }
+      return;
+    }
+
+    window.history.pushState({ wonderlaStep: next }, "", window.location.href);
+    setStep(next);
+  };
+
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      const previousStep = event.state?.wonderlaStep as StepValue | undefined;
+      setStep(previousStep || steps.LANDING);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   // Re-fetch the latest config for this park (powers the "Refresh"
   // buttons on Live Wait Times & Maintenance Log — truly live now).
