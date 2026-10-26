@@ -97,7 +97,7 @@ const QrCodeMain = ({ initialConfig }: Props) => {
           />
         );
       case steps.PARK_MAP:
-        return <ParkMapStep updateStep={updateStep} />;
+        return <ParkMapStep updateStep={updateStep} parkName={config.name} places={config.parkMap.places} />;
       case steps.RIDE_EVENT_DETAILS:
         return (
           <RideEventDetailStep

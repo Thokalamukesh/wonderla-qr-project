@@ -8,6 +8,7 @@ import {
   TileLayer,
   useMap,
 } from "react-leaflet";
+import type { ParkMapPlace } from "../_lib/types";
 
 const WONDERLA: L.LatLngExpression = [12.8343, 77.401];
 const WONDERLA_LINK = "https://www.google.com/maps/dir/?api=1&destination=12.8343%2C77.401&travelmode=driving&dir_action=navigate";
@@ -49,23 +50,20 @@ function MapController({
   recenterRequest: number;
 }) {
   const map = useMap();
-  const hasFittedLiveLocation = useRef(false);
+  const hasCenteredOnInitialLocation = useRef(false);
 
   useEffect(() => {
-    if (!userLocation || hasFittedLiveLocation.current) return;
-    hasFittedLiveLocation.current = true;
-    map.fitBounds(L.latLngBounds([WONDERLA, [userLocation.lat, userLocation.lng]]), {
-      padding: [40, 40],
-      maxZoom: 15,
-    });
+    if (!userLocation || hasCenteredOnInitialLocation.current) return;
+    hasCenteredOnInitialLocation.current = true;
+    map.panTo([userLocation.lat, userLocation.lng]);
   }, [map, userLocation]);
 
   useEffect(() => {
     if (recenterRequest === 0) return;
     if (userLocation) {
-      map.flyTo([userLocation.lat, userLocation.lng], 16, { duration: 0.6 });
+      map.panTo([userLocation.lat, userLocation.lng]);
     } else {
-      map.flyTo(WONDERLA, 15, { duration: 0.6 });
+      map.panTo(WONDERLA);
     }
   }, [map, recenterRequest, userLocation]);
 
@@ -74,9 +72,10 @@ function MapController({
 
 interface Props {
   parkName?: string;
+  places?: ParkMapPlace[];
 }
 
-export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru" }: Props) {
+export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", places = [] }: Props) {
   const [userLocation, setUserLocation] = useState<LiveLocation | null>(null);
   const [locationStatus, setLocationStatus] = useState("Finding your live location…");
   const [recenterRequest, setRecenterRequest] = useState(0);
@@ -114,7 +113,7 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru" }: 
     : null;
 
   return (
-    <section className="grid h-full min-h-0 w-full grid-rows-[minmax(0,1fr)_minmax(0,1fr)] overflow-hidden rounded-2xl bg-white shadow-xl lg:grid-cols-2 lg:grid-rows-1">
+    <section className="grid h-full min-h-0 w-full grid-rows-[minmax(0,1fr)_minmax(0,1fr)] overflow-hidden bg-white lg:grid-cols-2 lg:grid-rows-1">
       <div className="relative z-0 min-h-0 overflow-hidden bg-[#e9eef0]">
         <MapContainer
           center={WONDERLA}
@@ -188,7 +187,7 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru" }: 
               <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#a27d00]">Your park trip</p>
               <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-[#191919]">Where to?</h1>
             </div>
-            <span className="rounded-full bg-[#fff5c2] px-3 py-1.5 text-xs font-extrabold text-[#705900]">Bengaluru</span>
+            <span className="rounded-full bg-[#fff5c2] px-3 py-1.5 text-xs font-extrabold text-[#705900]">{places.length} places</span>
           </div>
 
           <div className="mt-4 rounded-2xl border border-[#e8e8e8] bg-[#f7f7f7] px-4 py-3">
@@ -241,6 +240,35 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru" }: 
               </a>
             </article>
           </div>
+
+          <section className="mt-5">
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <h2 className="text-base font-extrabold text-[#191919]">Available in the park</h2>
+              <span className="text-xs font-semibold text-[#858585]">Tap a place</span>
+            </div>
+            {places.length ? (
+              <div className="space-y-2">
+                {places.map((place) => (
+                  <a
+                    key={`${place.name}-${place.category}`}
+                    href={`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(parkName)}&destination=${encodeURIComponent(`${place.name}, ${parkName}`)}&travelmode=walking&dir_action=navigate`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex min-h-14 w-full items-center gap-3 rounded-xl border border-[#ededed] bg-white px-3 py-2.5 text-left transition hover:border-[#e4bd00] hover:bg-[#fffdf3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#bd9700]"
+                  >
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#fff5c2] text-sm font-extrabold text-[#604d00]">{place.name.slice(0, 1)}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-bold text-[#222]">{place.name}</span>
+                      <span className="mt-0.5 block text-xs text-[#858585]">{place.category}</span>
+                    </span>
+                    <span className="shrink-0 rounded-full bg-[#f5c400] px-2.5 py-1 text-[11px] font-extrabold text-[#191919]">Go ↗</span>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p className="rounded-xl bg-[#f7f7f7] p-3 text-sm text-[#777]">Park locations have not been added yet.</p>
+            )}
+          </section>
 
           <p className="mt-4 text-center text-xs leading-relaxed text-[#888]">
             {mapReady ? "Map ready · OpenStreetMap" : mapTileError ? "Map tiles are having trouble loading" : "Loading map tiles…"}
