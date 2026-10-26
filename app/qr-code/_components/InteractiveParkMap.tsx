@@ -102,6 +102,7 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
   const routePolylines = useRef<google.maps.Polyline[]>([]);
   const lastRoutedOrigin = useRef<LiveLocation | null>(null);
   const lastRoutedDestination = useRef<string | null>(null);
+  const routeRequestInFlight = useRef<number | null>(null);
   const routeRequestId = useRef(0);
   const [userLocation, setUserLocation] = useState<LiveLocation | null>(null);
   const [locationStatus, setLocationStatus] = useState("Finding your live location…");
@@ -142,6 +143,7 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
     return () => {
       active = false;
       routeRequestId.current += 1;
+      routeRequestInFlight.current = null;
       routePolylines.current.forEach((polyline) => polyline.setMap(null));
       userMarker.current?.setMap(null);
       destinationMarker.current?.setMap(null);
@@ -206,15 +208,18 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
     }
 
     const previousOrigin = lastRoutedOrigin.current;
+    // GPS can emit frequent updates while Google is still calculating. Keep that
+    // request alive instead of cancelling it and starting over on every update.
+    if (routeRequestInFlight.current !== null) return;
     if (
       previousOrigin
       && lastRoutedDestination.current === activeDestination.name
       && distanceInMeters(previousOrigin, userLocation) < REROUTE_AFTER_METERS
     ) return;
 
-    let active = true;
     const timeout = window.setTimeout(async () => {
       const requestId = ++routeRequestId.current;
+      routeRequestInFlight.current = requestId;
       setRouteStatus("Finding the walking route…");
 
       try {
@@ -236,7 +241,7 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
           ],
         });
 
-        if (!active || requestId !== routeRequestId.current) return;
+        if (requestId !== routeRequestId.current) return;
         const route = response.routes?.[0];
         if (!route) throw new Error("Google Maps could not find a walking route to this place.");
 
@@ -252,6 +257,9 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
         routePolylines.current.forEach((polyline) => polyline.setMap(map));
 
         const path = route.path ?? [];
+        if (!path.length || !routePolylines.current.length) {
+          throw new Error("Google returned directions without a route line. Check that this place has a mapped location.");
+        }
         if (path.length) {
           const end = path[path.length - 1];
           if (!destinationMarker.current) {
@@ -297,16 +305,16 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
         lastRoutedDestination.current = activeDestination.name;
         setRouteStatus("Walking route ready");
       } catch (error) {
-        if (!active || requestId !== routeRequestId.current) return;
+        if (requestId !== routeRequestId.current) return;
         setRouteSummary(null);
         setRouteStatus(error instanceof Error ? error.message : "Could not calculate a walking route.");
+      } finally {
+        if (routeRequestInFlight.current === requestId) routeRequestInFlight.current = null;
       }
     }, 700);
 
     return () => {
-      active = false;
       window.clearTimeout(timeout);
-      routeRequestId.current += 1;
     };
   }, [activeDestination, mapReady, parkName, userLocation]);
 
@@ -322,6 +330,8 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
     destinationMarker.current = null;
     lastRoutedOrigin.current = null;
     lastRoutedDestination.current = null;
+    routeRequestId.current += 1;
+    routeRequestInFlight.current = null;
     setRouteSummary(null);
     setRouteStatus(userLocation ? "Finding the walking route…" : "Waiting for live location…");
     setActiveDestination(place);
@@ -335,6 +345,8 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
     destinationMarker.current = null;
     lastRoutedOrigin.current = null;
     lastRoutedDestination.current = null;
+    routeRequestId.current += 1;
+    routeRequestInFlight.current = null;
     setActiveDestination(null);
     setRouteSummary(null);
     setRouteStatus("");
@@ -416,7 +428,7 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
               </div>
               {routeSummary?.steps.length ? (
                 <ol className="mt-2 space-y-1.5 border-t border-[#d7e7ff] pt-2">
-                  {routeSummary.steps.slice(0, 4).map((step, index) => (
+                  {routeSummary.steps.slice(0, 8).map((step, index) => (
                     <li key={`${index}-${step}`} className="flex gap-2 text-xs leading-relaxed text-[#4d4d4d]">
                       <span className="font-bold text-[#1673e8]">{index + 1}.</span><span>{step}</span>
                     </li>
