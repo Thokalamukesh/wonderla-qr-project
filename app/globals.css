@@ -7,6 +7,11 @@
 .wonderla-map-pin-wrap { background: transparent; border: 0; }
 .wonderla-map-pin { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 2px solid white; border-radius: 50% 50% 50% 0; color: white; font-size: 17px; font-weight: 800; box-shadow: 0 2px 7px #0f172a66; transform: rotate(-45deg); }
 .wonderla-map-pin::first-letter { transform: rotate(45deg); }
+.live-map-marker-wrap { background: transparent; border: 0; }
+.live-map-destination { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 3px solid white; border-radius: 50% 50% 50% 0; background: #e11d48; color: white; box-shadow: 0 2px 8px #0f172a66; transform: rotate(-45deg); }
+.live-map-destination span { font-size: 18px; font-weight: 900; transform: rotate(45deg); }
+.live-map-user { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border: 3px solid white; border-radius: 50%; background: #2563eb; box-shadow: 0 1px 8px #0f172a88; }
+.live-map-user span { width: 8px; height: 8px; border-radius: 50%; background: white; }
 
 :root {
   --font-mulish: "Mulish", system-ui, sans-serif;

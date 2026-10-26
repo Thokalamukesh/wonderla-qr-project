@@ -16,8 +16,8 @@ const ParkMapStep = ({ updateStep, data, parkName }: Props) => (
   <div className="min-h-screen bg-blue">
     <Header title="Park Map" onBack={() => updateStep(steps.LANDING)} />
     <div className="px-4 py-5">
-      {data?.img && data.places?.length ? (
-        <InteractiveParkMap image={data.img} places={data.places} parkName={parkName} />
+      {parkName.toLowerCase().includes("bengaluru") ? (
+        <InteractiveParkMap parkName={parkName} />
       ) : data?.img ? (
         <img src={data.img} alt="Park map" className="w-full rounded-2xl object-contain" />
       ) : (
@@ -25,10 +25,10 @@ const ParkMapStep = ({ updateStep, data, parkName }: Props) => (
           <span className="text-6xl">🗺️</span>
         </div>
       )}
-      {data?.description && (
+      {!parkName.toLowerCase().includes("bengaluru") && data?.description && (
         <p className="mt-3 font-mulish text-sm text-white/85">{data.description}</p>
       )}
-      {Array.isArray(data?.zones) && data.zones.length > 0 && !data?.places?.length && (
+      {!parkName.toLowerCase().includes("bengaluru") && Array.isArray(data?.zones) && data.zones.length > 0 && !data?.places?.length && (
         <div className="mt-4 flex flex-col gap-3">
           {data.zones.map((zone, i) => (
             <div key={`${zone.name}-${i}`} className="rounded-2xl bg-white p-4 shadow-[0_6px_18px_rgba(0,0,0,0.12)]">
