@@ -52,7 +52,7 @@ export default function MapSettingsPanel() {
           Add your browser API key here. Saving it makes the map use it without changing Vercel environment variables.
         </p>
         <div className="mt-4 rounded-lg bg-amber-50 p-3 text-xs leading-relaxed text-amber-900">
-          The map key is sent to visitors’ browsers so Google Maps can load. In Google Cloud Console, restrict it to Maps JavaScript API and Routes API, and allow your Vercel and custom domains as website referrers.
+          The map key is sent to visitors’ browsers so Google Maps can load. In Google Cloud Console, enable Maps JavaScript API, Routes API, and Places API (New). Restrict the key to those APIs and allow your Vercel and custom domains as website referrers.
         </div>
         <form onSubmit={save} className="mt-5 space-y-3">
           <label className="block text-sm font-semibold text-slate-700" htmlFor="maps-api-key">Google Maps API key</label>

@@ -227,14 +227,35 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
       try {
         const { Route } = await google.maps.importLibrary("routes") as google.maps.RoutesLibrary;
         const knownCoordinates = KNOWN_PLACE_COORDINATES[activeDestination.name.trim().toLowerCase()];
+        let googlePlace: google.maps.places.Place | null = null;
+        try {
+          const { Place } = await google.maps.importLibrary("places") as google.maps.PlacesLibrary;
+          const search = await Place.searchByText({
+            textQuery: `${activeDestination.name}, ${parkName}`,
+            fields: ["id", "displayName", "location"],
+            locationBias: { center: WONDERLA, radius: 1500 },
+            maxResultCount: 8,
+            region: "IN",
+          });
+          const candidates = (search.places || [])
+            .filter((place) => place.id && place.location)
+            .filter((place) => distanceInMeters(WONDERLA, place.location!.toJSON()) <= 1500);
+          const reference = knownCoordinates ?? WONDERLA;
+          candidates.sort((a, b) =>
+            distanceInMeters(reference, a.location!.toJSON()) - distanceInMeters(reference, b.location!.toJSON())
+          );
+          googlePlace = candidates[0] ?? null;
+        } catch {
+          // Use configured coordinates/text when Places API is not enabled or has no match.
+        }
         const destinationCoordinates = typeof activeDestination.lat === "number" && typeof activeDestination.lng === "number"
           ? { lat: activeDestination.lat, lng: activeDestination.lng }
           : knownCoordinates;
         const response = await Route.computeRoutes({
           origin: { lat: userLocation.lat, lng: userLocation.lng },
-          destination: destinationCoordinates
-            ? destinationCoordinates
-            : `${activeDestination.name}, ${parkName}, India`,
+          destination: googlePlace?.id
+            ? new google.maps.places.Place({ id: googlePlace.id })
+            : destinationCoordinates || `${activeDestination.name}, ${parkName}, India`,
           travelMode: google.maps.TravelMode.WALKING,
           language: "en",
           units: google.maps.UnitSystem.METRIC,
