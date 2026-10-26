@@ -48,7 +48,11 @@ function formatCoordinate(value: number, direction: "N" | "S" | "E" | "W") {
   return `${Math.abs(value).toFixed(5)}° ${value < 0 ? (direction === "N" ? "S" : "W") : direction}`;
 }
 
-export default function InteractiveParkMap() {
+interface Props {
+  parkName?: string;
+}
+
+export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru" }: Props) {
   const mapElement = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<google.maps.Map | null>(null);
   const userMarker = useRef<google.maps.Marker | null>(null);
@@ -177,7 +181,7 @@ export default function InteractiveParkMap() {
   const distance = userLocation ? distanceInKm(userLocation, WONDERLA) : null;
 
   return (
-    <section className="grid h-[calc(100dvh-124px)] min-h-[560px] grid-rows-[minmax(260px,1fr)_minmax(260px,1fr)] overflow-hidden rounded-2xl bg-white shadow-lg lg:grid-cols-2 lg:grid-rows-1">
+    <section className="grid h-full min-h-0 w-full grid-rows-[minmax(0,1fr)_minmax(0,1fr)] overflow-hidden rounded-2xl bg-white shadow-lg lg:grid-cols-2 lg:grid-rows-1">
       <div className="relative min-h-0 bg-slate-100">
         <div ref={mapElement} className="absolute inset-0" aria-label="Google map showing your live location and Wonderla Bengaluru" />
         {mapError ? (
@@ -193,7 +197,7 @@ export default function InteractiveParkMap() {
         ) : null}
 
         <div className="pointer-events-none absolute left-3 top-3 z-20 rounded-xl bg-white/95 px-3 py-2 shadow-md">
-          <p className="text-sm font-bold text-slate-900">Wonderla Bengaluru</p>
+          <p className="text-sm font-bold text-slate-900">{parkName}</p>
           <p className="mt-0.5 text-xs text-slate-500">12.8343° N, 77.4010° E</p>
         </div>
         <button
@@ -243,12 +247,20 @@ export default function InteractiveParkMap() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h2 className="font-bold text-slate-900">Wonderla Bengaluru</h2>
+                      <h2 className="font-bold text-slate-900">{parkName}</h2>
                       <p className="mt-1 text-sm text-slate-500">Mysore Road, Bengaluru</p>
                     </div>
                     {distance !== null && <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-indigo-700">{distance < 1 ? `${Math.round(distance * 1000)} m` : `${distance.toFixed(1)} km`}</span>}
                   </div>
                   <p className="mt-3 text-xs text-slate-400">12.8343° N, 77.4010° E</p>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${WONDERLA.lat}%2C${WONDERLA.lng}&travelmode=driving&dir_action=navigate`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  >
+                    Navigate with Google Maps
+                  </a>
                 </div>
               </div>
             </article>

@@ -10,9 +10,9 @@ interface Props {
 }
 
 const ParkMapStep = ({ updateStep }: Props) => (
-  <div className="min-h-screen bg-blue">
+  <div className="flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-blue">
     <Header title="Park Map" onBack={() => updateStep(steps.LANDING)} />
-    <div className="px-4 py-5">
+    <div className="flex min-h-0 flex-1 px-4 pb-4 pt-4">
       <InteractiveParkMap parkName="Wonderla Bengaluru" />
     </div>
   </div>
