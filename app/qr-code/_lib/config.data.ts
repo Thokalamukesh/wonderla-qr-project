@@ -210,7 +210,7 @@ export function createDefaultParkConfig(
         { name: "Park View Restaurant", category: "Dining", x: 11, y: 27 },
         { name: "Food Court", category: "Dining", x: 29, y: 24 },
         { name: "Wonderla Bamba", category: "Ride", x: 33, y: 27 },
-        { name: "Recoil", category: "Ride", x: 77, y: 30 },
+        { name: "Recoil", category: "Ride", x: 77, y: 30, lat: 12.832685, lng: 77.401272 },
         { name: "Wave Pool", category: "Water rides", x: 17, y: 46 },
         { name: "Lazy River", category: "Water rides", x: 49, y: 57 },
         { name: "Drop Loop", category: "Water rides", x: 48, y: 29 },

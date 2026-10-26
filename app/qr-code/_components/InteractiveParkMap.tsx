@@ -5,6 +5,9 @@ import type { ParkMapPlace } from "../_lib/types";
 
 const WONDERLA: google.maps.LatLngLiteral = { lat: 12.8343, lng: 77.401 };
 const REROUTE_AFTER_METERS = 35;
+const KNOWN_PLACE_COORDINATES: Record<string, Coordinates> = {
+  recoil: { lat: 12.832685, lng: 77.401272 },
+};
 
 declare global {
   interface Window {
@@ -224,9 +227,15 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
 
       try {
         const { Route } = await google.maps.importLibrary("routes") as google.maps.RoutesLibrary;
+        const knownCoordinates = KNOWN_PLACE_COORDINATES[activeDestination.name.trim().toLowerCase()];
+        const destinationCoordinates = typeof activeDestination.lat === "number" && typeof activeDestination.lng === "number"
+          ? { lat: activeDestination.lat, lng: activeDestination.lng }
+          : knownCoordinates;
         const response = await Route.computeRoutes({
           origin: { lat: userLocation.lat, lng: userLocation.lng },
-          destination: `${activeDestination.name}, ${parkName}, India`,
+          destination: destinationCoordinates
+            ? destinationCoordinates
+            : `${activeDestination.name}, ${parkName}, India`,
           travelMode: google.maps.TravelMode.WALKING,
           language: "en",
           units: google.maps.UnitSystem.METRIC,

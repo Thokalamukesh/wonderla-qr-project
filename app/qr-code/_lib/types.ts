@@ -74,6 +74,9 @@ export interface ParkMapPlace {
   category: string;
   x: number;
   y: number;
+  /** Exact park coordinate used for walking navigation when available. */
+  lat?: number;
+  lng?: number;
   avatarImage?: string;
 }
 
