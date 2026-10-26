@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import { steps, StepValue } from "../_lib/config.data";
 import Header from "./_shared/Header";
 
-const InteractiveParkMap = dynamic(() => import("./InteractiveParkMap"), { ssr: false, loading: () => <div className="flex h-[55vh] min-h-[340px] items-center justify-center rounded-2xl bg-white text-sm text-slate-500">Loading park map…</div> });
+const InteractiveParkMap = dynamic(() => import("./InteractiveParkMap"), { ssr: false, loading: () => <div className="flex h-full min-h-0 w-full items-center justify-center rounded-2xl bg-white text-sm text-slate-500">Loading park map…</div> });
 
 interface Props {
   updateStep: (step: StepValue) => void;
