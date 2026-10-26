@@ -1,109 +1,55 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import L from "leaflet";
-import {
-  CircleMarker,
-  ImageOverlay,
-  MapContainer,
-  Marker,
-  Polyline,
-  TileLayer,
-  ZoomControl,
-  useMap,
-} from "react-leaflet";
 import type { ParkMapPlace } from "../_lib/types";
 
-const WONDERLA: L.LatLngExpression = [12.8343, 77.401];
-const PARK_LAYOUT_IMAGE = "/wonderla/parks/bengaluru-layout.jpg";
-const IMAGE_HEIGHT_TO_WIDTH = 1381 / 1800;
-const PARK_LAYOUT_BOUNDS: L.LatLngBoundsExpression = [[0, 0], [100 * IMAGE_HEIGHT_TO_WIDTH, 100]];
-type MapPoint = [number, number];
+const WONDERLA: google.maps.LatLngLiteral = { lat: 12.8343, lng: 77.401 };
+const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+const REROUTE_AFTER_METERS = 35;
 
-// Waypoints are percent positions on the Bengaluru park layout image (x, y).
-// Each route begins at the park's marked Entrance / Exit (#2).
-const WALKING_ROUTES: Record<string, MapPoint[]> = {
-  "Entrance / Exit": [[24, 30]],
-  "Park View Restaurant": [[24, 30], [22, 30], [20, 29], [17, 28], [11, 27]],
-  "Food Court": [[24, 30], [26, 30], [28, 28], [29, 24]],
-  "Wonderla Bamba": [[24, 30], [27, 31], [29, 30], [31, 28], [33, 27]],
-  Recoil: [[24, 30], [31, 32], [38, 34], [44, 32], [50, 29], [57, 28], [64, 29], [71, 31], [77, 30]],
-  "Wave Pool": [[24, 30], [22, 34], [21, 38], [19, 42], [17, 46]],
-  "Lazy River": [[24, 30], [29, 32], [34, 36], [39, 41], [43, 46], [47, 51], [49, 57]],
-  "Drop Loop": [[24, 30], [29, 30], [34, 30], [39, 29], [44, 28], [48, 29]],
-  Harakiri: [[24, 30], [30, 32], [36, 36], [42, 40], [47, 45], [51, 50], [55, 56], [58, 61]],
-  Boomerang: [[24, 30], [30, 32], [36, 36], [42, 40], [47, 45], [52, 50], [56, 55], [58, 58]],
-  "First Aid": [[24, 30], [29, 31], [34, 33], [39, 35], [44, 36], [48, 37]],
-  "Dome Plaza": [[24, 30], [27, 30], [29, 29], [31, 29]],
-};
-
-const userIcon = L.divIcon({
-  className: "wonderla-user-marker",
-  html: '<span class="wonderla-user-marker__dot"><span></span></span>',
-  iconSize: [28, 28],
-  iconAnchor: [14, 14],
-});
-
-type LiveLocation = { lat: number; lng: number; accuracy: number };
-
-function formatCoordinate(value: number, direction: "N" | "S" | "E" | "W") {
-  return `${Math.abs(value).toFixed(5)}° ${value < 0 ? (direction === "N" ? "S" : "W") : direction}`;
+declare global {
+  interface Window {
+    google?: typeof google;
+  }
 }
 
-function distanceInKm(from: LiveLocation, to: { lat: number; lng: number }) {
+type Coordinates = { lat: number; lng: number };
+type LiveLocation = Coordinates & { accuracy: number };
+type RouteSummary = { distance: string; duration: string; steps: string[] };
+
+let mapsScriptPromise: Promise<void> | null = null;
+
+function loadGoogleMaps(apiKey: string): Promise<void> {
+  if (window.google?.maps) return Promise.resolve();
+  if (mapsScriptPromise) return mapsScriptPromise;
+
+  mapsScriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&v=weekly&loading=async`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => resolve();
+    script.onerror = () => {
+      mapsScriptPromise = null;
+      reject(new Error("Google Maps could not load. Check the key, enabled APIs, and website restrictions."));
+    };
+    document.head.appendChild(script);
+  });
+
+  return mapsScriptPromise;
+}
+
+function distanceInMeters(from: Coordinates, to: Coordinates) {
   const radians = (degrees: number) => degrees * Math.PI / 180;
   const latitudeDelta = radians(to.lat - from.lat);
   const longitudeDelta = radians(to.lng - from.lng);
   const value = Math.sin(latitudeDelta / 2) ** 2
     + Math.cos(radians(from.lat)) * Math.cos(radians(to.lat)) * Math.sin(longitudeDelta / 2) ** 2;
-  return 6371 * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
+  return 6371000 * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
 }
 
-function LiveMapController({
-  userLocation,
-  recenterRequest,
-}: {
-  userLocation: LiveLocation | null;
-  recenterRequest: number;
-}) {
-  const map = useMap();
-  const hasCenteredOnInitialLocation = useRef(false);
-
-  useEffect(() => {
-    if (!userLocation || hasCenteredOnInitialLocation.current) return;
-    hasCenteredOnInitialLocation.current = true;
-    map.panTo([userLocation.lat, userLocation.lng]);
-  }, [map, userLocation]);
-
-  useEffect(() => {
-    if (recenterRequest === 0) return;
-    map.panTo(userLocation ? [userLocation.lat, userLocation.lng] : WONDERLA);
-  }, [map, recenterRequest, userLocation]);
-
-  return null;
-}
-
-function ParkRouteLayers({ place, route }: { place: ParkMapPlace; route: MapPoint[] }) {
-  const map = useMap();
-  const routePositions = route.map(([x, y]) => [(100 - y) * IMAGE_HEIGHT_TO_WIDTH, x] as [number, number]);
-  const destination: L.LatLngExpression = [(100 - place.y) * IMAGE_HEIGHT_TO_WIDTH, place.x];
-  const entrance: L.LatLngExpression = [(100 - 30) * IMAGE_HEIGHT_TO_WIDTH, 24];
-
-  useEffect(() => {
-    map.fitBounds(PARK_LAYOUT_BOUNDS, { padding: [8, 8] });
-  }, [map]);
-
-  return (
-    <>
-      <ImageOverlay url={PARK_LAYOUT_IMAGE} bounds={PARK_LAYOUT_BOUNDS} />
-      <Polyline
-        positions={routePositions}
-        pathOptions={{ color: "#1673e8", weight: 7, opacity: 0.92, lineCap: "round", lineJoin: "round" }}
-      />
-      <CircleMarker center={entrance} radius={8} pathOptions={{ color: "#fff", weight: 3, fillColor: "#202020", fillOpacity: 1 }} />
-      <CircleMarker center={destination} radius={9} pathOptions={{ color: "#fff", weight: 3, fillColor: "#1673e8", fillOpacity: 1 }} />
-    </>
-  );
+function distanceInKm(from: Coordinates, to: Coordinates) {
+  return distanceInMeters(from, to) / 1000;
 }
 
 interface Props {
@@ -112,12 +58,58 @@ interface Props {
 }
 
 export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", places = [] }: Props) {
+  const mapElement = useRef<HTMLDivElement>(null);
+  const mapInstance = useRef<google.maps.Map | null>(null);
+  const userMarker = useRef<google.maps.Marker | null>(null);
+  const destinationMarker = useRef<google.maps.Marker | null>(null);
+  const routePolylines = useRef<google.maps.Polyline[]>([]);
+  const lastRoutedOrigin = useRef<LiveLocation | null>(null);
+  const lastRoutedDestination = useRef<string | null>(null);
+  const routeRequestId = useRef(0);
   const [userLocation, setUserLocation] = useState<LiveLocation | null>(null);
   const [locationStatus, setLocationStatus] = useState("Finding your live location…");
-  const [recenterRequest, setRecenterRequest] = useState(0);
+  const [mapError, setMapError] = useState("");
   const [mapReady, setMapReady] = useState(false);
-  const [mapTileError, setMapTileError] = useState(false);
   const [activeDestination, setActiveDestination] = useState<ParkMapPlace | null>(null);
+  const [routeStatus, setRouteStatus] = useState("");
+  const [routeSummary, setRouteSummary] = useState<RouteSummary | null>(null);
+
+  useEffect(() => {
+    if (!API_KEY) {
+      setMapError("Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in Vercel Environment Variables to show the Google map.");
+      return;
+    }
+
+    let active = true;
+    loadGoogleMaps(API_KEY)
+      .then(async () => {
+        const { Map } = await window.google!.maps.importLibrary("maps") as google.maps.MapsLibrary;
+        if (!active || !mapElement.current) return;
+
+        mapInstance.current = new Map(mapElement.current, {
+          center: WONDERLA,
+          zoom: 16,
+          mapTypeId: "roadmap",
+          disableDefaultUI: true,
+          clickableIcons: false,
+          gestureHandling: "greedy",
+          zoomControl: true,
+        });
+        setMapReady(true);
+      })
+      .catch((error: unknown) => {
+        if (active) setMapError(error instanceof Error ? error.message : "Google Maps could not be loaded.");
+      });
+
+    return () => {
+      active = false;
+      routeRequestId.current += 1;
+      routePolylines.current.forEach((polyline) => polyline.setMap(null));
+      userMarker.current?.setMap(null);
+      destinationMarker.current?.setMap(null);
+      mapInstance.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -135,110 +127,222 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
           ? "Allow location access to show your position."
           : "Could not get your location. Check location services.");
       },
-      { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 },
+      { enableHighAccuracy: true, maximumAge: 3000, timeout: 15000 },
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
+  useEffect(() => {
+    const map = mapInstance.current;
+    if (!map || !mapReady || !userLocation) return;
+
+    if (!userMarker.current) {
+      userMarker.current = new google.maps.Marker({
+        map,
+        position: userLocation,
+        title: "Your live location",
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: "#1673e8",
+          fillOpacity: 1,
+          strokeColor: "#ffffff",
+          strokeWeight: 3,
+          scale: 9,
+        },
+        zIndex: 1000,
+      });
+      map.panTo(userLocation);
+    } else {
+      userMarker.current.setPosition(userLocation);
+      if (activeDestination) map.panTo(userLocation);
+    }
+  }, [activeDestination, mapReady, userLocation]);
+
+  useEffect(() => {
+    const map = mapInstance.current;
+    if (!mapReady || !map || !activeDestination) return;
+    if (!userLocation) {
+      setRouteStatus("Allow location access to calculate a walking route.");
+      return;
+    }
+
+    const previousOrigin = lastRoutedOrigin.current;
+    if (
+      previousOrigin
+      && lastRoutedDestination.current === activeDestination.name
+      && distanceInMeters(previousOrigin, userLocation) < REROUTE_AFTER_METERS
+    ) return;
+
+    let active = true;
+    const timeout = window.setTimeout(async () => {
+      const requestId = ++routeRequestId.current;
+      setRouteStatus("Finding the walking route…");
+
+      try {
+        const { Route } = await google.maps.importLibrary("routes") as google.maps.RoutesLibrary;
+        const response = await Route.computeRoutes({
+          origin: { lat: userLocation.lat, lng: userLocation.lng },
+          destination: `${activeDestination.name}, ${parkName}, India`,
+          travelMode: google.maps.TravelMode.WALKING,
+          language: "en",
+          units: google.maps.UnitSystem.METRIC,
+          fields: [
+            "path",
+            "distanceMeters",
+            "durationMillis",
+            "localizedValues",
+            "legs.steps.instructions",
+            "legs.steps.distanceMeters",
+            "legs.steps.localizedValues",
+          ],
+        });
+
+        if (!active || requestId !== routeRequestId.current) return;
+        const route = response.routes?.[0];
+        if (!route) throw new Error("Google Maps could not find a walking route to this place.");
+
+        routePolylines.current.forEach((polyline) => polyline.setMap(null));
+        routePolylines.current = route.createPolylines({
+          polylineOptions: {
+            strokeColor: "#1673e8",
+            strokeOpacity: 0.94,
+            strokeWeight: 7,
+            zIndex: 900,
+          },
+        });
+        routePolylines.current.forEach((polyline) => polyline.setMap(map));
+
+        const path = route.path ?? [];
+        if (path.length) {
+          const end = path[path.length - 1];
+          if (!destinationMarker.current) {
+            destinationMarker.current = new google.maps.Marker({
+              map,
+              position: end,
+              title: activeDestination.name,
+              label: { text: activeDestination.name.slice(0, 1), color: "#ffffff", fontWeight: "700" },
+              icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                fillColor: "#e11d48",
+                fillOpacity: 1,
+                strokeColor: "#ffffff",
+                strokeWeight: 3,
+                scale: 10,
+              },
+              zIndex: 950,
+            });
+          } else {
+            destinationMarker.current.setPosition(end);
+            destinationMarker.current.setTitle(activeDestination.name);
+            destinationMarker.current.setLabel({ text: activeDestination.name.slice(0, 1), color: "#ffffff", fontWeight: "700" });
+          }
+
+          const destinationChanged = lastRoutedDestination.current !== activeDestination.name;
+          if (destinationChanged) {
+            const bounds = new google.maps.LatLngBounds();
+            path.forEach((point) => bounds.extend(point));
+            map.fitBounds(bounds, 56);
+          }
+        }
+
+        const steps = (route.legs ?? [])
+          .flatMap((leg) => leg.steps ?? [])
+          .map((step) => step.instructions)
+          .filter((instruction): instruction is string => Boolean(instruction));
+        setRouteSummary({
+          distance: route.localizedValues?.distance || `${((route.distanceMeters ?? 0) / 1000).toFixed(1)} km`,
+          duration: route.localizedValues?.staticDuration || `${Math.max(1, Math.round((route.durationMillis ?? 0) / 60000))} min`,
+          steps,
+        });
+        lastRoutedOrigin.current = userLocation;
+        lastRoutedDestination.current = activeDestination.name;
+        setRouteStatus("Walking route ready");
+      } catch (error) {
+        if (!active || requestId !== routeRequestId.current) return;
+        setRouteSummary(null);
+        setRouteStatus(error instanceof Error ? error.message : "Could not calculate a walking route.");
+      }
+    }, 700);
+
+    return () => {
+      active = false;
+      window.clearTimeout(timeout);
+      routeRequestId.current += 1;
+    };
+  }, [activeDestination, mapReady, parkName, userLocation]);
+
   const centerOnUser = useCallback(() => {
-    setRecenterRequest((request) => request + 1);
+    const map = mapInstance.current;
+    if (map) map.panTo(userLocation ?? WONDERLA);
+  }, [userLocation]);
+
+  const selectDestination = useCallback((place: ParkMapPlace) => {
+    routePolylines.current.forEach((polyline) => polyline.setMap(null));
+    routePolylines.current = [];
+    destinationMarker.current?.setMap(null);
+    destinationMarker.current = null;
+    lastRoutedOrigin.current = null;
+    lastRoutedDestination.current = null;
+    setRouteSummary(null);
+    setRouteStatus(userLocation ? "Finding the walking route…" : "Waiting for live location…");
+    setActiveDestination(place);
+  }, [userLocation]);
+
+  const clearRoute = useCallback(() => {
+    routeRequestId.current += 1;
+    routePolylines.current.forEach((polyline) => polyline.setMap(null));
+    routePolylines.current = [];
+    destinationMarker.current?.setMap(null);
+    destinationMarker.current = null;
+    lastRoutedOrigin.current = null;
+    lastRoutedDestination.current = null;
+    setActiveDestination(null);
+    setRouteSummary(null);
+    setRouteStatus("");
   }, []);
 
-  const showRoute = useCallback((place: ParkMapPlace) => {
-    if (parkName.toLowerCase().includes("bengaluru") && WALKING_ROUTES[place.name]) {
-      setActiveDestination(place);
-    }
-  }, [parkName]);
-
-  const activeRoute = activeDestination ? WALKING_ROUTES[activeDestination.name] : null;
-  const distance = userLocation ? distanceInKm(userLocation, { lat: 12.8343, lng: 77.401 }) : null;
+  const distance = userLocation ? distanceInKm(userLocation, WONDERLA) : null;
 
   return (
     <section className="grid h-full min-h-0 w-full grid-rows-[minmax(0,1fr)_minmax(0,1fr)] overflow-hidden bg-white lg:grid-cols-2 lg:grid-rows-1">
       <div className="relative z-0 min-h-0 overflow-hidden bg-[#e9eef0]">
-        {activeDestination && activeRoute ? (
-          <MapContainer
-            key={`park-route-${activeDestination.name}`}
-            center={[38, 50]}
-            zoom={-5}
-            minZoom={-9}
-            maxZoom={4}
-            crs={L.CRS.Simple}
-            zoomControl={false}
-            scrollWheelZoom
-            className="h-full w-full bg-[#eef0e4]"
-          >
-            <ZoomControl position="bottomright" />
-            <ParkRouteLayers place={activeDestination} route={activeRoute} />
-          </MapContainer>
-        ) : (
-          <MapContainer
-            center={WONDERLA}
-            zoom={15}
-            zoomControl={false}
-            scrollWheelZoom
-            className="h-full w-full"
-            aria-label="Map showing your live location"
-          >
-            <ZoomControl position="topright" />
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-              maxZoom={19}
-              eventHandlers={{
-                load: () => {
-                  setMapReady(true);
-                  setMapTileError(false);
-                },
-                tileerror: () => setMapTileError(true),
-              }}
-            />
-            {userLocation && <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon} title="Your live location" />}
-            <LiveMapController userLocation={userLocation} recenterRequest={recenterRequest} />
-          </MapContainer>
-        )}
+        <div ref={mapElement} className="absolute inset-0" aria-label="Google map showing your live location and walking routes" />
 
-        {activeDestination ? (
-          <div className="absolute left-3 right-3 top-3 z-[500] flex items-center gap-2 rounded-2xl bg-white/95 p-2.5 shadow-lg backdrop-blur-sm">
-            <button
-              type="button"
-              onClick={() => setActiveDestination(null)}
-              className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#f3f3f3] text-lg font-bold text-[#191919]"
-              aria-label="Return to live map"
-            >
-              ←
-            </button>
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.13em] text-[#727272]">Walking route · Start at Entrance / Exit</p>
-              <p className="truncate text-sm font-extrabold text-[#191919]">{activeDestination.name}</p>
+        {mapError ? (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-50 p-6 text-center">
+            <div className="max-w-sm">
+              <p className="font-bold text-slate-800">Google Map unavailable</p>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">{mapError}</p>
+              <p className="mt-2 text-xs text-slate-500">Check that Maps JavaScript API and Routes API are enabled and the website is allowed by the key restrictions.</p>
             </div>
           </div>
-        ) : (
-          <>
-            <button
-              type="button"
-              onClick={centerOnUser}
-              className="absolute bottom-5 right-4 z-[500] flex size-12 items-center justify-center rounded-full bg-white text-xl text-[#191919] shadow-lg transition hover:bg-[#f5f5f5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1673e8]"
-              aria-label="Center map on my location"
-              title="Center map on my location"
-            >
-              ◎
-            </button>
-            <div className="absolute bottom-4 left-3 z-[500] flex items-center gap-2 rounded-full bg-white px-3 py-2 text-[11px] font-bold text-[#454545] shadow-md">
-              <i className="size-2.5 rounded-full bg-[#2674e8]" />Your location
-            </div>
-          </>
-        )}
+        ) : !mapReady ? (
+          <div className="absolute inset-0 z-10 flex items-center justify-center text-sm text-slate-600">Loading Google Maps…</div>
+        ) : null}
 
-        {!activeDestination && !mapReady && !mapTileError && (
-          <div className="pointer-events-none absolute bottom-16 left-3 z-[500] rounded-lg bg-white/95 px-3 py-2 text-xs font-semibold text-[#555] shadow">
-            Loading map…
+        {mapReady && activeDestination && (
+          <div className="pointer-events-none absolute left-3 top-3 z-20 max-w-[calc(100%-24px)] rounded-xl bg-white/95 px-3 py-2.5 shadow-md">
+            <p className="text-[10px] font-extrabold uppercase tracking-[0.13em] text-[#386da9]">Live walking route</p>
+            <p className="truncate text-sm font-extrabold text-[#191919]">{activeDestination.name}</p>
           </div>
         )}
-        {!activeDestination && mapTileError && (
-          <div className="pointer-events-none absolute bottom-16 left-3 z-[500] rounded-lg bg-white/95 px-3 py-2 text-xs font-semibold text-[#555] shadow">
-            Some map tiles could not load. Check your connection.
+
+        {mapReady && (
+          <button
+            type="button"
+            onClick={centerOnUser}
+            className="absolute bottom-5 right-4 z-20 flex size-12 items-center justify-center rounded-full bg-white text-xl text-[#191919] shadow-lg transition hover:bg-[#f5f5f5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1673e8]"
+            aria-label="Center map on my location"
+            title="Center map on my location"
+          >
+            ◎
+          </button>
+        )}
+
+        {mapReady && !activeDestination && (
+          <div className="pointer-events-none absolute bottom-4 left-3 z-20 flex items-center gap-2 rounded-full bg-white px-3 py-2 text-[11px] font-bold text-[#454545] shadow-md">
+            <i className="size-2.5 rounded-full bg-[#1673e8]" />Your live location
           </div>
         )}
       </div>
@@ -255,7 +359,7 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
           </div>
 
           <article className="mt-3 flex items-center gap-3 rounded-xl bg-[#f7f7f7] px-3 py-2.5">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#eaf2ff] text-[#2674e8]">●</span>
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#eaf2ff] text-[#1673e8]">●</span>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-bold text-[#191919]">Your location</p>
               <p className="truncate text-xs text-[#777]">{locationStatus}</p>
@@ -264,42 +368,63 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
           </article>
 
           {activeDestination && (
-            <div className="mt-3 rounded-xl border border-[#d7e7ff] bg-[#f4f8ff] px-3 py-2.5">
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.13em] text-[#386da9]">Route shown on map</p>
-              <p className="mt-0.5 text-sm font-bold text-[#202020]">Entrance / Exit → {activeDestination.name}</p>
-            </div>
+            <article className="mt-3 rounded-xl border border-[#d7e7ff] bg-[#f4f8ff] px-3 py-2.5">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.13em] text-[#386da9]">{routeStatus}</p>
+                  <p className="mt-0.5 truncate text-sm font-bold text-[#202020]">To {activeDestination.name}</p>
+                </div>
+                {routeSummary && <span className="shrink-0 text-right text-xs font-bold text-[#386da9]">{routeSummary.distance}<br />{routeSummary.duration}</span>}
+              </div>
+              {routeSummary?.steps.length ? (
+                <ol className="mt-2 space-y-1.5 border-t border-[#d7e7ff] pt-2">
+                  {routeSummary.steps.slice(0, 4).map((step, index) => (
+                    <li key={`${index}-${step}`} className="flex gap-2 text-xs leading-relaxed text-[#4d4d4d]">
+                      <span className="font-bold text-[#1673e8]">{index + 1}.</span><span>{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              ) : null}
+              {routeSummary && (
+                <p className="mt-2 text-[10px] leading-relaxed text-[#777]">Walking routes can miss some pedestrian paths. Follow park signs and staff directions.</p>
+              )}
+              <button
+                type="button"
+                onClick={clearRoute}
+                className="mt-2 text-xs font-bold text-[#386da9] underline underline-offset-2"
+              >
+                Clear route
+              </button>
+            </article>
           )}
 
           <div className="mt-3 space-y-2">
             {places.map((place) => {
-              const canNavigate = parkName.toLowerCase().includes("bengaluru") && Boolean(WALKING_ROUTES[place.name]);
               const isActive = activeDestination?.name === place.name;
               return (
                 <button
                   key={`${place.name}-${place.category}`}
                   type="button"
-                  onClick={() => showRoute(place)}
-                  disabled={!canNavigate}
+                  onClick={() => selectDestination(place)}
+                  disabled={!mapReady}
                   aria-pressed={isActive}
-                  className={`flex min-h-[58px] w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1673e8] disabled:cursor-not-allowed disabled:opacity-55 ${isActive ? "border-[#1673e8] bg-[#f1f7ff]" : "border-[#ededed] bg-white hover:border-[#d6d6d6] hover:bg-[#fafafa]"}`}
+                  className={`flex min-h-[58px] w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1673e8] disabled:cursor-wait disabled:opacity-55 ${isActive ? "border-[#1673e8] bg-[#f1f7ff]" : "border-[#ededed] bg-white hover:border-[#d6d6d6] hover:bg-[#fafafa]"}`}
                 >
                   <span
                     className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#e5e5e5] bg-[#fff5c2] bg-cover bg-center text-sm font-extrabold text-[#604d00]"
                     style={{
-                      backgroundImage: `url("${place.avatarImage || PARK_LAYOUT_IMAGE}")`,
+                      backgroundImage: `url("${place.avatarImage || "/wonderla/parks/bengaluru-layout.jpg"}")`,
                       backgroundSize: place.avatarImage ? "cover" : "350% auto",
                       backgroundPosition: place.avatarImage ? "center" : `${place.x}% ${place.y}%`,
                     }}
                     aria-hidden="true"
-                  >
-                    {!place.avatarImage && <span className="sr-only">{place.name}</span>}
-                  </span>
+                  />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-bold text-[#222]">{place.name}</span>
                     <span className="mt-0.5 block text-xs text-[#858585]">{place.category}</span>
                   </span>
                   <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-extrabold ${isActive ? "bg-[#1673e8] text-white" : "bg-[#f5c400] text-[#191919]"}`}>
-                    {!canNavigate ? "Soon" : isActive ? "On map" : "Route"}
+                    {isActive ? "Routing" : "Navigate"}
                   </span>
                 </button>
               );
@@ -309,19 +434,9 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
             )}
           </div>
 
-          {activeDestination && (
-            <button
-              type="button"
-              onClick={() => setActiveDestination(null)}
-              className="mt-3 min-h-11 w-full rounded-xl border border-[#e5e5e5] px-4 py-2 text-sm font-bold text-[#555] hover:bg-[#f7f7f7]"
-            >
-              Clear route
-            </button>
-          )}
-
           {!activeDestination && (
             <p className="mt-3 text-center text-[11px] leading-relaxed text-[#858585]">
-              {userLocation && distance !== null ? `${distance < 1 ? `${Math.round(distance * 1000)} m` : `${distance.toFixed(1)} km`} from Wonderla` : mapReady ? "Choose a place to see its walking route on the map." : mapTileError ? "Map tiles could not load. Check your connection." : "Loading live map…"}
+              {userLocation && distance !== null ? `${distance < 1 ? `${Math.round(distance * 1000)} m` : `${distance.toFixed(1)} km`} from Wonderla` : mapError || "Allow location access to get walking directions from where you are."}
             </p>
           )}
         </div>

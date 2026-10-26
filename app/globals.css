@@ -20,27 +20,3 @@ body {
 .font-mulish {
   font-family: var(--font-mulish);
 }
-
-.wonderla-user-marker {
-  background: transparent;
-  border: 0;
-}
-
-.wonderla-user-marker__dot,
-.wonderla-user-marker__dot span {
-  position: absolute;
-  display: block;
-  border-radius: 50%;
-}
-
-.wonderla-user-marker__dot {
-  inset: 3px;
-  background: rgb(38 116 232 / 20%);
-}
-
-.wonderla-user-marker__dot span {
-  inset: 6px;
-  border: 3px solid #fff;
-  background: #2674e8;
-  box-shadow: 0 2px 7px rgb(0 0 0 / 30%);
-}
