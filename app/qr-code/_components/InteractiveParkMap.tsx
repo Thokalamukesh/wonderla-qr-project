@@ -198,7 +198,6 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
       map.panTo(userLocation);
     } else {
       userMarker.current.setPosition(userLocation);
-      if (activeDestination) map.panTo(userLocation);
     }
   }, [activeDestination, mapReady, userLocation]);
 
