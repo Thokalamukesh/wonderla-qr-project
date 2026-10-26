@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { ParkMapPlace } from "../_lib/types";
 
 const WONDERLA: google.maps.LatLngLiteral = { lat: 12.8343, lng: 77.401 };
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 const REROUTE_AFTER_METERS = 35;
 
 declare global {
@@ -75,14 +74,15 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
   const [routeSummary, setRouteSummary] = useState<RouteSummary | null>(null);
 
   useEffect(() => {
-    if (!API_KEY) {
-      setMapError("Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in Vercel Environment Variables to show the Google map.");
-      return;
-    }
-
     let active = true;
-    loadGoogleMaps(API_KEY)
-      .then(async () => {
+    fetch("/qr-code/api/map-settings", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Could not load map settings.");
+        return response.json() as Promise<{ apiKey?: string }>;
+      })
+      .then(async ({ apiKey }) => {
+        if (!apiKey) throw new Error("Add your Google Maps API key in Admin → Map to show the map.");
+        await loadGoogleMaps(apiKey);
         const { Map } = await window.google!.maps.importLibrary("maps") as google.maps.MapsLibrary;
         if (!active || !mapElement.current) return;
 

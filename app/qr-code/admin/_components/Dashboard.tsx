@@ -2,6 +2,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ParkEditor from "./ParkEditor";
 import UsersPanel from "./UsersPanel";
+import MapSettingsPanel from "./MapSettingsPanel";
 import type { ParkConfig, ParkSummary } from "../../_lib/types";
 
 type Role = "superadmin" | "park";
@@ -18,7 +19,7 @@ interface Props {
 
 const Dashboard = ({ user, onLogout }: Props) => {
   const isSuper = user.role === "superadmin";
-  const [view, setView] = useState<"parks" | "users">("parks");
+  const [view, setView] = useState<"parks" | "users" | "map">("parks");
 
   const [parks, setParks] = useState<ParkSummary[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
@@ -101,7 +102,7 @@ const Dashboard = ({ user, onLogout }: Props) => {
           <h1 className="text-base font-bold text-slate-800 sm:text-lg">Wonderla QR Admin</h1>
           {isSuper && (
             <nav className="flex gap-1 rounded-lg bg-slate-100 p-1">
-              {(["parks", "users"] as const).map((v) => (
+              {(["parks", "map", "users"] as const).map((v) => (
                 <button
                   key={v}
                   onClick={() => setView(v)}
@@ -141,6 +142,8 @@ const Dashboard = ({ user, onLogout }: Props) => {
           <UsersPanel currentUsername={user.username} />
         </div>
       )}
+
+      {isSuper && view === "map" && <MapSettingsPanel />}
 
       {/* Parks view (superadmin) OR single-park editor (park user) */}
       {(!isSuper || view === "parks") && (

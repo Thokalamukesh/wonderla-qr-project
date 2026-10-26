@@ -291,7 +291,7 @@ const ParkEditor = ({ config, onSaved, onDeleted, canManagePark = true }: Props)
           <p className="mt-1 text-xs leading-relaxed text-slate-600">
             The Park Map screen shows a live street map centered on Wonderla Bengaluru (12.8343, 77.4010). Uploaded map files and image-based pins are no longer used.
           </p>
-          <p className="mt-2 text-xs text-slate-500">The Google Maps API key is configured through NEXT_PUBLIC_GOOGLE_MAPS_API_KEY.</p>
+          <p className="mt-2 text-xs text-slate-500">Configure the Google Maps API key from the Admin → Map tab.</p>
         </div>
       </Section>
       {/* Rides */}
