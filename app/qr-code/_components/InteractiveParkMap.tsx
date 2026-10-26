@@ -264,9 +264,9 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
             "distanceMeters",
             "durationMillis",
             "localizedValues",
-            "legs.steps.instructions",
-            "legs.steps.distanceMeters",
-            "legs.steps.localizedValues",
+            // Request the complete step objects. Routes API exposes the
+            // maneuver text as navigationInstruction.instructions.
+            "legs.steps",
           ],
         });
 
@@ -464,6 +464,11 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
                   ))}
                 </ol>
               ) : null}
+              {routeSummary && routeSummary.steps.length === 0 && (
+                <p className="mt-2 border-t border-[#d7e7ff] pt-2 text-xs leading-relaxed text-[#4d4d4d]">
+                  Follow the blue walking path on the map to {activeDestination.name}.
+                </p>
+              )}
               {routeSummary && (
                 <p className="mt-2 text-[10px] leading-relaxed text-[#777]">Walking routes can miss some pedestrian paths. Follow park signs and staff directions.</p>
               )}
