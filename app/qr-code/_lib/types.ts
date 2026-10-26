@@ -74,6 +74,7 @@ export interface ParkMapPlace {
   category: string;
   x: number;
   y: number;
+  avatarImage?: string;
 }
 
 export interface ParkMapConfig {

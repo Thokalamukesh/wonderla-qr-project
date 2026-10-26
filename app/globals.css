@@ -21,32 +21,9 @@ body {
   font-family: var(--font-mulish);
 }
 
-.wonderla-map-marker,
 .wonderla-user-marker {
   background: transparent;
   border: 0;
-}
-
-.wonderla-map-marker__pin {
-  display: flex;
-  width: 38px;
-  height: 38px;
-  align-items: center;
-  justify-content: center;
-  border: 3px solid #fff;
-  border-radius: 50% 50% 50% 8px;
-  background: #f5c400;
-  box-shadow: 0 3px 12px rgb(0 0 0 / 28%);
-  color: #191919;
-  font-size: 14px;
-  font-weight: 900;
-  transform: rotate(-45deg);
-}
-
-.wonderla-map-marker__pin b {
-  display: block;
-  font-weight: 900;
-  transform: rotate(45deg);
 }
 
 .wonderla-user-marker__dot,

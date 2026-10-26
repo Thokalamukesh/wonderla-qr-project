@@ -97,7 +97,19 @@ const QrCodeMain = ({ initialConfig }: Props) => {
           />
         );
       case steps.PARK_MAP:
-        return <ParkMapStep updateStep={updateStep} parkName={config.name} places={config.parkMap.places} />;
+        return (
+          <ParkMapStep
+            updateStep={updateStep}
+            parkName={config.name}
+            places={config.parkMap.places?.map((place) => ({
+              ...place,
+              avatarImage: config.rides.find((ride) => ride.title.toLowerCase() === place.name.toLowerCase())?.img
+                || config.dining.find((outlet) => outlet.name.toLowerCase() === place.name.toLowerCase())?.img
+                || config.waveRainDance.find((event) => event.title.toLowerCase() === place.name.toLowerCase())?.img
+                || undefined,
+            }))}
+          />
+        );
       case steps.RIDE_EVENT_DETAILS:
         return (
           <RideEventDetailStep

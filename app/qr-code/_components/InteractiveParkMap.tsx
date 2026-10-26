@@ -3,24 +3,39 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import {
+  CircleMarker,
+  ImageOverlay,
   MapContainer,
   Marker,
+  Polyline,
   TileLayer,
+  ZoomControl,
   useMap,
 } from "react-leaflet";
 import type { ParkMapPlace } from "../_lib/types";
 
 const WONDERLA: L.LatLngExpression = [12.8343, 77.401];
-const WONDERLA_LINK = "https://www.google.com/maps/dir/?api=1&destination=12.8343%2C77.401&travelmode=driving&dir_action=navigate";
+const PARK_LAYOUT_IMAGE = "/wonderla/parks/bengaluru-layout.jpg";
+const IMAGE_HEIGHT_TO_WIDTH = 1381 / 1800;
+const PARK_LAYOUT_BOUNDS: L.LatLngBoundsExpression = [[0, 0], [100 * IMAGE_HEIGHT_TO_WIDTH, 100]];
+type MapPoint = [number, number];
 
-type LiveLocation = { lat: number; lng: number; accuracy: number };
-
-const parkIcon = L.divIcon({
-  className: "wonderla-map-marker",
-  html: '<span class="wonderla-map-marker__pin"><b>W</b></span>',
-  iconSize: [38, 38],
-  iconAnchor: [19, 19],
-});
+// Waypoints are percent positions on the Bengaluru park layout image (x, y).
+// Each route begins at the park's marked Entrance / Exit (#2).
+const WALKING_ROUTES: Record<string, MapPoint[]> = {
+  "Entrance / Exit": [[24, 30]],
+  "Park View Restaurant": [[24, 30], [22, 30], [20, 29], [17, 28], [11, 27]],
+  "Food Court": [[24, 30], [26, 30], [28, 28], [29, 24]],
+  "Wonderla Bamba": [[24, 30], [27, 31], [29, 30], [31, 28], [33, 27]],
+  Recoil: [[24, 30], [31, 32], [38, 34], [44, 32], [50, 29], [57, 28], [64, 29], [71, 31], [77, 30]],
+  "Wave Pool": [[24, 30], [22, 34], [21, 38], [19, 42], [17, 46]],
+  "Lazy River": [[24, 30], [29, 32], [34, 36], [39, 41], [43, 46], [47, 51], [49, 57]],
+  "Drop Loop": [[24, 30], [29, 30], [34, 30], [39, 29], [44, 28], [48, 29]],
+  Harakiri: [[24, 30], [30, 32], [36, 36], [42, 40], [47, 45], [51, 50], [55, 56], [58, 61]],
+  Boomerang: [[24, 30], [30, 32], [36, 36], [42, 40], [47, 45], [52, 50], [56, 55], [58, 58]],
+  "First Aid": [[24, 30], [29, 31], [34, 33], [39, 35], [44, 36], [48, 37]],
+  "Dome Plaza": [[24, 30], [27, 30], [29, 29], [31, 29]],
+};
 
 const userIcon = L.divIcon({
   className: "wonderla-user-marker",
@@ -28,6 +43,12 @@ const userIcon = L.divIcon({
   iconSize: [28, 28],
   iconAnchor: [14, 14],
 });
+
+type LiveLocation = { lat: number; lng: number; accuracy: number };
+
+function formatCoordinate(value: number, direction: "N" | "S" | "E" | "W") {
+  return `${Math.abs(value).toFixed(5)}° ${value < 0 ? (direction === "N" ? "S" : "W") : direction}`;
+}
 
 function distanceInKm(from: LiveLocation, to: { lat: number; lng: number }) {
   const radians = (degrees: number) => degrees * Math.PI / 180;
@@ -38,11 +59,7 @@ function distanceInKm(from: LiveLocation, to: { lat: number; lng: number }) {
   return 6371 * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
 }
 
-function formatCoordinate(value: number, direction: "N" | "S" | "E" | "W") {
-  return `${Math.abs(value).toFixed(5)}° ${value < 0 ? (direction === "N" ? "S" : "W") : direction}`;
-}
-
-function MapController({
+function LiveMapController({
   userLocation,
   recenterRequest,
 }: {
@@ -60,14 +77,33 @@ function MapController({
 
   useEffect(() => {
     if (recenterRequest === 0) return;
-    if (userLocation) {
-      map.panTo([userLocation.lat, userLocation.lng]);
-    } else {
-      map.panTo(WONDERLA);
-    }
+    map.panTo(userLocation ? [userLocation.lat, userLocation.lng] : WONDERLA);
   }, [map, recenterRequest, userLocation]);
 
   return null;
+}
+
+function ParkRouteLayers({ place, route }: { place: ParkMapPlace; route: MapPoint[] }) {
+  const map = useMap();
+  const routePositions = route.map(([x, y]) => [(100 - y) * IMAGE_HEIGHT_TO_WIDTH, x] as [number, number]);
+  const destination: L.LatLngExpression = [(100 - place.y) * IMAGE_HEIGHT_TO_WIDTH, place.x];
+  const entrance: L.LatLngExpression = [(100 - 30) * IMAGE_HEIGHT_TO_WIDTH, 24];
+
+  useEffect(() => {
+    map.fitBounds(PARK_LAYOUT_BOUNDS, { padding: [8, 8] });
+  }, [map]);
+
+  return (
+    <>
+      <ImageOverlay url={PARK_LAYOUT_IMAGE} bounds={PARK_LAYOUT_BOUNDS} />
+      <Polyline
+        positions={routePositions}
+        pathOptions={{ color: "#1673e8", weight: 7, opacity: 0.92, lineCap: "round", lineJoin: "round" }}
+      />
+      <CircleMarker center={entrance} radius={8} pathOptions={{ color: "#fff", weight: 3, fillColor: "#202020", fillOpacity: 1 }} />
+      <CircleMarker center={destination} radius={9} pathOptions={{ color: "#fff", weight: 3, fillColor: "#1673e8", fillOpacity: 1 }} />
+    </>
+  );
 }
 
 interface Props {
@@ -81,6 +117,7 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
   const [recenterRequest, setRecenterRequest] = useState(0);
   const [mapReady, setMapReady] = useState(false);
   const [mapTileError, setMapTileError] = useState(false);
+  const [activeDestination, setActiveDestination] = useState<ParkMapPlace | null>(null);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -108,171 +145,185 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
     setRecenterRequest((request) => request + 1);
   }, []);
 
-  const distance = userLocation
-    ? distanceInKm(userLocation, { lat: 12.8343, lng: 77.401 })
-    : null;
+  const showRoute = useCallback((place: ParkMapPlace) => {
+    if (parkName.toLowerCase().includes("bengaluru") && WALKING_ROUTES[place.name]) {
+      setActiveDestination(place);
+    }
+  }, [parkName]);
+
+  const activeRoute = activeDestination ? WALKING_ROUTES[activeDestination.name] : null;
+  const distance = userLocation ? distanceInKm(userLocation, { lat: 12.8343, lng: 77.401 }) : null;
 
   return (
     <section className="grid h-full min-h-0 w-full grid-rows-[minmax(0,1fr)_minmax(0,1fr)] overflow-hidden bg-white lg:grid-cols-2 lg:grid-rows-1">
       <div className="relative z-0 min-h-0 overflow-hidden bg-[#e9eef0]">
-        <MapContainer
-          center={WONDERLA}
-          zoom={15}
-          zoomControl={false}
-          scrollWheelZoom
-          className="h-full w-full"
-          aria-label="Map showing your live location and Wonderla Bengaluru"
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-            maxZoom={19}
-            eventHandlers={{
-              load: () => {
-                setMapReady(true);
-                setMapTileError(false);
-              },
-              tileerror: () => setMapTileError(true),
-            }}
-          />
-          <Marker position={WONDERLA} icon={parkIcon} title={parkName} />
-          {userLocation && (
-            <Marker
-              position={[userLocation.lat, userLocation.lng]}
-              icon={userIcon}
-              title="Your live location"
+        {activeDestination && activeRoute ? (
+          <MapContainer
+            key={`park-route-${activeDestination.name}`}
+            center={[38, 50]}
+            zoom={-5}
+            minZoom={-9}
+            maxZoom={4}
+            crs={L.CRS.Simple}
+            zoomControl={false}
+            scrollWheelZoom
+            className="h-full w-full bg-[#eef0e4]"
+          >
+            <ZoomControl position="bottomright" />
+            <ParkRouteLayers place={activeDestination} route={activeRoute} />
+          </MapContainer>
+        ) : (
+          <MapContainer
+            center={WONDERLA}
+            zoom={15}
+            zoomControl={false}
+            scrollWheelZoom
+            className="h-full w-full"
+            aria-label="Map showing your live location"
+          >
+            <ZoomControl position="topright" />
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+              maxZoom={19}
+              eventHandlers={{
+                load: () => {
+                  setMapReady(true);
+                  setMapTileError(false);
+                },
+                tileerror: () => setMapTileError(true),
+              }}
             />
-          )}
-          <MapController userLocation={userLocation} recenterRequest={recenterRequest} />
-        </MapContainer>
+            {userLocation && <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon} title="Your live location" />}
+            <LiveMapController userLocation={userLocation} recenterRequest={recenterRequest} />
+          </MapContainer>
+        )}
 
-        <div className="pointer-events-none absolute left-3 top-3 z-[500] rounded-2xl bg-white px-4 py-3 shadow-lg">
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#757575]">Wonderla park</p>
-          <p className="mt-0.5 text-sm font-extrabold text-[#191919]">{parkName}</p>
-          <p className="mt-1 text-xs text-[#676767]">12.8343° N · 77.4010° E</p>
-        </div>
+        {activeDestination ? (
+          <div className="absolute left-3 right-3 top-3 z-[500] flex items-center gap-2 rounded-2xl bg-white/95 p-2.5 shadow-lg backdrop-blur-sm">
+            <button
+              type="button"
+              onClick={() => setActiveDestination(null)}
+              className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#f3f3f3] text-lg font-bold text-[#191919]"
+              aria-label="Return to live map"
+            >
+              ←
+            </button>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-extrabold uppercase tracking-[0.13em] text-[#727272]">Walking route · Start at Entrance / Exit</p>
+              <p className="truncate text-sm font-extrabold text-[#191919]">{activeDestination.name}</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={centerOnUser}
+              className="absolute bottom-5 right-4 z-[500] flex size-12 items-center justify-center rounded-full bg-white text-xl text-[#191919] shadow-lg transition hover:bg-[#f5f5f5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1673e8]"
+              aria-label="Center map on my location"
+              title="Center map on my location"
+            >
+              ◎
+            </button>
+            <div className="absolute bottom-4 left-3 z-[500] flex items-center gap-2 rounded-full bg-white px-3 py-2 text-[11px] font-bold text-[#454545] shadow-md">
+              <i className="size-2.5 rounded-full bg-[#2674e8]" />Your location
+            </div>
+          </>
+        )}
 
-        <button
-          type="button"
-          onClick={centerOnUser}
-          className="absolute bottom-5 right-4 z-[500] flex size-12 items-center justify-center rounded-full bg-white text-xl text-[#191919] shadow-lg transition hover:bg-[#fff9dc] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f5c400]"
-          aria-label="Center map on my location"
-          title="Center map on my location"
-        >
-          ◎
-        </button>
-
-        <div className="absolute bottom-4 left-3 z-[500] flex items-center gap-3 rounded-full bg-white px-3 py-2 text-[11px] font-bold text-[#454545] shadow-md">
-          <span className="flex items-center gap-1.5"><i className="size-2.5 rounded-full bg-[#2674e8]" />You</span>
-          <span className="flex items-center gap-1.5"><i className="flex size-4 items-center justify-center rounded-full bg-[#f5c400] text-[9px] not-italic text-black">W</i>Wonderla</span>
-        </div>
-
-        {!mapReady && !mapTileError && (
+        {!activeDestination && !mapReady && !mapTileError && (
           <div className="pointer-events-none absolute bottom-16 left-3 z-[500] rounded-lg bg-white/95 px-3 py-2 text-xs font-semibold text-[#555] shadow">
             Loading map…
           </div>
         )}
-        {mapTileError && (
+        {!activeDestination && mapTileError && (
           <div className="pointer-events-none absolute bottom-16 left-3 z-[500] rounded-lg bg-white/95 px-3 py-2 text-xs font-semibold text-[#555] shadow">
             Some map tiles could not load. Check your connection.
           </div>
         )}
       </div>
 
-      <aside className="relative z-10 min-h-0 overflow-y-auto overscroll-contain rounded-t-[28px] border-t border-[#eeeeee] bg-white px-5 pb-6 pt-2 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] lg:rounded-none lg:border-l lg:border-t-0 lg:px-6 lg:pt-6 lg:shadow-none">
-        <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-[#d8d8d8] lg:hidden" aria-hidden="true" />
+      <aside className="relative z-10 min-h-0 overflow-y-auto overscroll-contain rounded-t-[28px] border-t border-[#eeeeee] bg-white px-4 pb-5 pt-2 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] lg:rounded-none lg:border-l lg:border-t-0 lg:px-5 lg:pt-5 lg:shadow-none">
+        <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-[#d8d8d8] lg:hidden" aria-hidden="true" />
         <div className="mx-auto max-w-xl">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#a27d00]">Your park trip</p>
-              <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-[#191919]">Where to?</h1>
+              <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#927100]">Explore Wonderla</p>
+              <h1 className="mt-0.5 text-xl font-extrabold tracking-tight text-[#191919]">Available in the park</h1>
             </div>
             <span className="rounded-full bg-[#fff5c2] px-3 py-1.5 text-xs font-extrabold text-[#705900]">{places.length} places</span>
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#e8e8e8] bg-[#f7f7f7] px-4 py-3">
-            <p className="text-xs font-semibold text-[#777]">Destination</p>
-            <p className="mt-1 font-extrabold text-[#191919]">{parkName}</p>
-          </div>
-
-          <div className="mt-4 space-y-3">
-            <article className="flex items-center gap-3 rounded-2xl border border-[#ededed] p-4">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#eaf2ff] text-lg text-[#2674e8]">●</span>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <h2 className="font-bold text-[#191919]">Your location</h2>
-                  <span className={`size-2.5 shrink-0 rounded-full ${userLocation ? "bg-emerald-500" : "bg-amber-400"}`} />
-                </div>
-                <p className="mt-1 text-sm text-[#777]">{locationStatus}</p>
-                {userLocation && (
-                  <p className="mt-1.5 text-xs text-[#8a8a8a]">
-                    {formatCoordinate(userLocation.lat, "N")}, {formatCoordinate(userLocation.lng, "E")} · ±{Math.round(userLocation.accuracy)} m
-                  </p>
-                )}
-              </div>
-            </article>
-
-            <article className="rounded-2xl border border-[#f0dc77] bg-[#fffdf3] p-4">
-              <div className="flex items-start gap-3">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#f5c400] font-extrabold text-[#191919]">W</span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h2 className="font-extrabold text-[#191919]">{parkName}</h2>
-                      <p className="mt-1 text-sm text-[#777]">Mysore Road, Bengaluru</p>
-                    </div>
-                    {distance !== null && (
-                      <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-extrabold text-[#555]">
-                        {distance < 1 ? `${Math.round(distance * 1000)} m` : `${distance.toFixed(1)} km`}
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-2 text-xs text-[#858585]">12.8343° N, 77.4010° E</p>
-                </div>
-              </div>
-              <a
-                href={WONDERLA_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 flex min-h-12 w-full items-center justify-center rounded-xl bg-[#f5c400] px-4 py-3 text-sm font-extrabold text-[#191919] transition hover:bg-[#e9b900] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#bd9700]"
-              >
-                Navigate with Google Maps <span className="ml-2" aria-hidden="true">↗</span>
-              </a>
-            </article>
-          </div>
-
-          <section className="mt-5">
-            <div className="mb-2 flex items-center justify-between gap-3">
-              <h2 className="text-base font-extrabold text-[#191919]">Available in the park</h2>
-              <span className="text-xs font-semibold text-[#858585]">Tap a place</span>
+          <article className="mt-3 flex items-center gap-3 rounded-xl bg-[#f7f7f7] px-3 py-2.5">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#eaf2ff] text-[#2674e8]">●</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold text-[#191919]">Your location</p>
+              <p className="truncate text-xs text-[#777]">{locationStatus}</p>
             </div>
-            {places.length ? (
-              <div className="space-y-2">
-                {places.map((place) => (
-                  <a
-                    key={`${place.name}-${place.category}`}
-                    href={`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(parkName)}&destination=${encodeURIComponent(`${place.name}, ${parkName}`)}&travelmode=walking&dir_action=navigate`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex min-h-14 w-full items-center gap-3 rounded-xl border border-[#ededed] bg-white px-3 py-2.5 text-left transition hover:border-[#e4bd00] hover:bg-[#fffdf3] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#bd9700]"
+            <span className={`size-2.5 shrink-0 rounded-full ${userLocation ? "bg-emerald-500" : "bg-amber-400"}`} />
+          </article>
+
+          {activeDestination && (
+            <div className="mt-3 rounded-xl border border-[#d7e7ff] bg-[#f4f8ff] px-3 py-2.5">
+              <p className="text-[10px] font-extrabold uppercase tracking-[0.13em] text-[#386da9]">Route shown on map</p>
+              <p className="mt-0.5 text-sm font-bold text-[#202020]">Entrance / Exit → {activeDestination.name}</p>
+            </div>
+          )}
+
+          <div className="mt-3 space-y-2">
+            {places.map((place) => {
+              const canNavigate = parkName.toLowerCase().includes("bengaluru") && Boolean(WALKING_ROUTES[place.name]);
+              const isActive = activeDestination?.name === place.name;
+              return (
+                <button
+                  key={`${place.name}-${place.category}`}
+                  type="button"
+                  onClick={() => showRoute(place)}
+                  disabled={!canNavigate}
+                  aria-pressed={isActive}
+                  className={`flex min-h-[58px] w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1673e8] disabled:cursor-not-allowed disabled:opacity-55 ${isActive ? "border-[#1673e8] bg-[#f1f7ff]" : "border-[#ededed] bg-white hover:border-[#d6d6d6] hover:bg-[#fafafa]"}`}
+                >
+                  <span
+                    className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#e5e5e5] bg-[#fff5c2] bg-cover bg-center text-sm font-extrabold text-[#604d00]"
+                    style={{
+                      backgroundImage: `url("${place.avatarImage || PARK_LAYOUT_IMAGE}")`,
+                      backgroundSize: place.avatarImage ? "cover" : "350% auto",
+                      backgroundPosition: place.avatarImage ? "center" : `${place.x}% ${place.y}%`,
+                    }}
+                    aria-hidden="true"
                   >
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#fff5c2] text-sm font-extrabold text-[#604d00]">{place.name.slice(0, 1)}</span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-bold text-[#222]">{place.name}</span>
-                      <span className="mt-0.5 block text-xs text-[#858585]">{place.category}</span>
-                    </span>
-                    <span className="shrink-0 rounded-full bg-[#f5c400] px-2.5 py-1 text-[11px] font-extrabold text-[#191919]">Go ↗</span>
-                  </a>
-                ))}
-              </div>
-            ) : (
+                    {!place.avatarImage && <span className="sr-only">{place.name}</span>}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-bold text-[#222]">{place.name}</span>
+                    <span className="mt-0.5 block text-xs text-[#858585]">{place.category}</span>
+                  </span>
+                  <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-extrabold ${isActive ? "bg-[#1673e8] text-white" : "bg-[#f5c400] text-[#191919]"}`}>
+                    {!canNavigate ? "Soon" : isActive ? "On map" : "Route"}
+                  </span>
+                </button>
+              );
+            })}
+            {places.length === 0 && (
               <p className="rounded-xl bg-[#f7f7f7] p-3 text-sm text-[#777]">Park locations have not been added yet.</p>
             )}
-          </section>
+          </div>
 
-          <p className="mt-4 text-center text-xs leading-relaxed text-[#888]">
-            {mapReady ? "Map ready · OpenStreetMap" : mapTileError ? "Map tiles are having trouble loading" : "Loading map tiles…"}
-          </p>
+          {activeDestination && (
+            <button
+              type="button"
+              onClick={() => setActiveDestination(null)}
+              className="mt-3 min-h-11 w-full rounded-xl border border-[#e5e5e5] px-4 py-2 text-sm font-bold text-[#555] hover:bg-[#f7f7f7]"
+            >
+              Clear route
+            </button>
+          )}
+
+          {!activeDestination && (
+            <p className="mt-3 text-center text-[11px] leading-relaxed text-[#858585]">
+              {userLocation && distance !== null ? `${distance < 1 ? `${Math.round(distance * 1000)} m` : `${distance.toFixed(1)} km`} from Wonderla` : mapReady ? "Choose a place to see its walking route on the map." : mapTileError ? "Map tiles could not load. Check your connection." : "Loading live map…"}
+            </p>
+          )}
         </div>
       </aside>
     </section>
