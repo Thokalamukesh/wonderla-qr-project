@@ -264,9 +264,9 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
             "distanceMeters",
             "durationMillis",
             "localizedValues",
-            // Request the complete step objects. Routes API exposes the
-            // maneuver text as navigationInstruction.instructions.
-            "legs.steps",
+            // Request the parent Route field. The JS Routes API rejects
+            // nested legs.steps field paths in this request's field mask.
+            "legs",
           ],
         });
 
