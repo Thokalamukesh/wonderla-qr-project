@@ -17,23 +17,61 @@ type LiveLocation = Coordinates & { accuracy: number };
 type RouteSummary = { distance: string; duration: string; steps: string[] };
 
 let mapsScriptPromise: Promise<void> | null = null;
+let mapsBootstrapPromise: Promise<void> | null = null;
+let mapsLoaderInstalled = false;
 
 function loadGoogleMaps(apiKey: string): Promise<void> {
-  if (window.google?.maps) return Promise.resolve();
   if (mapsScriptPromise) return mapsScriptPromise;
+  const existingImportLibrary: unknown = window.google?.maps?.importLibrary;
+  if (typeof existingImportLibrary === "function" && !mapsLoaderInstalled) return Promise.resolve();
 
-  mapsScriptPromise = new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&v=weekly&loading=async`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => resolve();
-    script.onerror = () => {
+  const googleNamespace = window.google || (window.google = {} as typeof google);
+  const maps = (googleNamespace.maps || (googleNamespace.maps = {} as typeof google.maps)) as typeof google.maps & {
+    __ib__?: () => void;
+  };
+  const requestedLibraries = new Set<string>();
+  type DynamicImport = (library: string, ...args: unknown[]) => Promise<unknown>;
+
+  const ensureScript = () => {
+    if (mapsBootstrapPromise) return mapsBootstrapPromise;
+    mapsBootstrapPromise = new Promise<void>((resolve, reject) => {
+      const script = document.createElement("script");
+      const params = new URLSearchParams({
+        key: apiKey,
+        v: "weekly",
+        libraries: [...requestedLibraries].join(","),
+        callback: "google.maps.__ib__",
+      });
+      maps.__ib__ = resolve;
+      script.src = `https://maps.googleapis.com/maps/api/js?${params.toString()}`;
+      script.async = true;
+      script.onerror = () => {
+        mapsBootstrapPromise = null;
+        mapsScriptPromise = null;
+        mapsLoaderInstalled = false;
+        (maps as unknown as { importLibrary: DynamicImport }).importLibrary = undefined as unknown as DynamicImport;
+        reject(new Error("Google Maps could not load. Check the key, enabled APIs, and website restrictions."));
+      };
+      script.nonce = document.querySelector<HTMLScriptElement>("script[nonce]")?.nonce || "";
+      document.head.appendChild(script);
+    });
+    return mapsBootstrapPromise;
+  };
+
+  // Google requires its dynamic-library bootstrap loader to install importLibrary.
+  mapsLoaderInstalled = true;
+  (maps as unknown as { importLibrary: DynamicImport }).importLibrary = (library, ...args) => {
+    requestedLibraries.add(library);
+    return ensureScript().then(() =>
+      (maps.importLibrary as DynamicImport)(library, ...args)
+    );
+  };
+  mapsScriptPromise = (maps.importLibrary as DynamicImport)("maps")
+    .then(() => undefined)
+    .catch((error: unknown) => {
       mapsScriptPromise = null;
-      reject(new Error("Google Maps could not load. Check the key, enabled APIs, and website restrictions."));
-    };
-    document.head.appendChild(script);
-  });
+      throw error;
+    });
 
   return mapsScriptPromise;
 }
