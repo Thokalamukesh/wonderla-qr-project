@@ -37,24 +37,28 @@ const LoginForm = ({ onSuccess }: Props) => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
-      <form onSubmit={submit} className="w-full max-w-sm rounded-xl bg-white p-8 shadow-md">
-        <h1 className="mb-1 text-xl font-bold text-slate-800">Wonderla QR Admin</h1>
-        <p className="mb-6 text-sm text-slate-500">Sign in to manage park configurations.</p>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#101c4b] px-4 py-10">
+      <div aria-hidden="true" className="absolute -right-24 -top-28 size-80 rounded-full bg-[#364fc8]/50 blur-3xl" />
+      <div aria-hidden="true" className="absolute -bottom-32 -left-20 size-80 rounded-full bg-[#ffd400]/15 blur-3xl" />
+      <form onSubmit={submit} className="relative w-full max-w-md rounded-[28px] border border-white/60 bg-white p-6 shadow-[0_30px_90px_rgba(0,0,0,0.3)] sm:p-9">
+        <img src="/wonderla/logo.png" alt="Wonderla" className="mb-7 h-12 w-auto object-contain object-left" />
+        <p className="mb-2 font-mulish text-[11px] font-extrabold uppercase tracking-[0.2em] text-indigo-600">Park management</p>
+        <h1 className="mb-2 text-2xl font-extrabold tracking-tight text-slate-900">Welcome back</h1>
+        <p className="mb-7 text-sm leading-relaxed text-slate-500">Sign in to manage park information and guest experiences.</p>
 
-        <label className="mb-1 block text-xs font-semibold text-slate-600">Username</label>
+        <label className="mb-1.5 block text-xs font-bold text-slate-700">Username</label>
         <input
-          className="mb-4 w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+          className="mb-5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           autoComplete="username"
           required
         />
 
-        <label className="mb-1 block text-xs font-semibold text-slate-600">Password</label>
+        <label className="mb-1.5 block text-xs font-bold text-slate-700">Password</label>
         <input
           type="password"
-          className="mb-4 w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+          className="mb-5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="current-password"
@@ -66,7 +70,7 @@ const LoginForm = ({ onSuccess }: Props) => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-indigo-600 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+          className="w-full rounded-xl bg-[#2A41B1] py-3 text-sm font-extrabold text-white shadow-lg shadow-indigo-900/20 transition hover:bg-[#20358f] active:scale-[0.99] disabled:opacity-60"
         >
           {loading ? "Signing in..." : "Sign in"}
         </button>

@@ -14,6 +14,32 @@ body {
   margin: 0;
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
+  font-family: var(--font-mulish);
+  color: #101a38;
+  background: #f4f6fb;
+  text-rendering: optimizeLegibility;
+}
+
+* { box-sizing: border-box; }
+
+button, input, textarea, select { font: inherit; }
+
+button { -webkit-tap-highlight-color: transparent; }
+
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 3px solid #ffcf00;
+  outline-offset: 2px;
+}
+
+::selection { color: #101a38; background: #ffdc42; }
+
+/* Admin forms share consistent sizing and keyboard focus across every panel. */
+[class*="border-slate-300"][class*="rounded"] {
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 
 .mulish,
