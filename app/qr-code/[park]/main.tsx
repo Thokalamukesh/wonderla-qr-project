@@ -11,6 +11,7 @@ import MaintenanceLog from "../_components/MaintenanceLog";
 import RideGuidlinesStep from "../_components/RideGuidlinesStep";
 import SafetyHygieneStep from "../_components/SafetyHygieneStep";
 import WavePoolStep from "../_components/WavePoolStep";
+import ScrollRevealEffects from "../_components/ScrollRevealEffects";
 
 interface Props {
   initialConfig: ParkConfig;
@@ -152,8 +153,11 @@ const QrCodeMain = ({ initialConfig }: Props) => {
   };
 
   return (
-    <div className="flex min-h-screen justify-center bg-[#e9edf7] sm:px-4 sm:py-5">
-      <main className="w-full max-w-[480px] overflow-hidden bg-[#f4f6fb] shadow-[0_16px_60px_rgba(20,36,90,0.12)] sm:rounded-[28px]">{renderSteps()}</main>
+    <div className="flex min-h-screen justify-center bg-gradient-to-br from-[#d9ead9] via-[#eff4e8] to-[#dcebe0] sm:px-4 sm:py-5">
+      <main data-guest-experience className="w-full max-w-[480px] overflow-hidden bg-gradient-to-b from-[#f4f8ef] via-[#eef6ef] to-[#f4f6ed] shadow-[0_16px_60px_rgba(18,76,53,0.14)] sm:rounded-[28px]">
+        <ScrollRevealEffects />
+        {renderSteps()}
+      </main>
     </div>
   );
 };

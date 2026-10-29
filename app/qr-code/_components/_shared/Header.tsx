@@ -9,7 +9,7 @@ interface Props {
 
 /** Shared branded header for each guest section. */
 const Header = ({ title, onBack, right }: Props) => (
-  <section className="sticky top-0 z-20 flex items-center justify-between gap-3 rounded-b-[24px] bg-gradient-to-r from-[#172b85] via-[#2A41B1] to-[#4359cf] px-4 py-4 shadow-[0_10px_26px_rgba(27,48,143,0.2)] sm:px-5">
+  <section className="sticky top-0 z-20 flex items-center justify-between gap-3 rounded-b-[24px] bg-gradient-to-r from-[#0e4c38] via-[#176b4a] to-[#31946a] px-4 py-4 shadow-[0_10px_26px_rgba(14,76,56,0.22)] sm:px-5">
     <div className="flex min-w-0 items-center gap-3">
       <button
         type="button"

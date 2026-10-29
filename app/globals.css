@@ -6,6 +6,10 @@
   --font-mulish: "Mulish", system-ui, sans-serif;
   --font-anton: "Anton", system-ui, sans-serif;
   --font-oswald: "Oswald", system-ui, sans-serif;
+  --wonderla-forest: #176b4a;
+  --wonderla-deep: #0e4c38;
+  --wonderla-mint: #edf7ef;
+  --wonderla-cream: #f5f7ed;
 }
 
 html,
@@ -45,4 +49,23 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .mulish,
 .font-mulish {
   font-family: var(--font-mulish);
+}
+
+[data-scroll-reveal] {
+  transition: opacity 500ms ease, transform 500ms cubic-bezier(0.2, 0.75, 0.25, 1), box-shadow 220ms ease;
+}
+
+[data-scroll-reveal]:not(.is-visible) {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0) scale(0.985);
+}
+
+[data-scroll-reveal].is-visible { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scroll-reveal], [data-scroll-reveal]:not(.is-visible) {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }

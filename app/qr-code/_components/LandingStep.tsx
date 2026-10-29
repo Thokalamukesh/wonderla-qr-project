@@ -29,9 +29,9 @@ const LandingStep = ({ updateStep, parkName, logoUrl, heroImage, icons }: Props)
   ];
 
   return (
-    <div className="min-h-screen bg-[#f4f6fb]">
+    <div className="min-h-screen bg-gradient-to-b from-[#f4f8ef] to-[#e9f3e8]">
       {/* Logo bar */}
-      <header className="flex justify-center border-b border-slate-100 bg-white px-4 py-2.5 shadow-sm">
+      <header className="flex justify-center border-b border-[#dcebdd] bg-[#f8faef] px-4 py-2.5 shadow-sm">
         <Wordmark logoUrl={logo} />
       </header>
 
@@ -41,7 +41,7 @@ const LandingStep = ({ updateStep, parkName, logoUrl, heroImage, icons }: Props)
           {heroImage ? (
             <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#3550d6] to-[#1b2a7a]" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#4ba975] via-[#176b4a] to-[#0e4c38]" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-[#0B1230]/95 via-[#0B1230]/25 to-[#0B1230]/5" />
           <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
@@ -68,7 +68,8 @@ const LandingStep = ({ updateStep, parkName, logoUrl, heroImage, icons }: Props)
               type="button"
               aria-label={`${t.label}: ${t.subtitle}`}
               onClick={() => updateStep(t.step)}
-              className="group flex min-h-[100px] items-start gap-2.5 rounded-2xl border border-slate-100 bg-white p-3 text-left shadow-[0_8px_22px_rgba(20,36,90,0.07)] transition hover:-translate-y-0.5 hover:border-indigo-100 hover:shadow-[0_14px_28px_rgba(20,36,90,0.12)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow sm:min-h-[108px] sm:gap-3 sm:p-3.5"
+              data-scroll-reveal
+              className="group flex min-h-[100px] items-start gap-2.5 rounded-2xl border border-[#dcebdd] bg-gradient-to-br from-[#fbfcf3] to-[#edf6ec] p-3 text-left shadow-[0_8px_22px_rgba(19,83,57,0.08)] transition hover:-translate-y-0.5 hover:border-[#b8d9c1] hover:shadow-[0_14px_28px_rgba(19,83,57,0.15)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow sm:min-h-[108px] sm:gap-3 sm:p-3.5"
             >
               <span
                 className="flex size-10 shrink-0 items-center justify-center rounded-xl text-[22px] shadow-sm transition-transform group-hover:scale-105 sm:size-11"

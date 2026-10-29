@@ -19,10 +19,10 @@ const RideEventDetailStep = ({ updateStep, rides, events }: Props) => {
   const data: Array<MediaItem | EventItem> = activeTab === tabs.RIDES ? rides : events;
 
   return (
-    <div className="min-h-screen bg-[#f4f6fb]">
+    <div className="min-h-screen bg-gradient-to-b from-[#f3f8ef] to-[#eaf3e8]">
       <Header title="Rides & Event Details" onBack={() => updateStep(steps.LANDING)} />
 
-      <div className="mx-4 mt-4 flex w-auto items-stretch rounded-2xl bg-white p-1.5 shadow-sm">
+      <div className="mx-4 mt-4 flex w-auto items-stretch rounded-2xl border border-[#dcebdd] bg-[#f8faef] p-1.5 shadow-sm">
         {(["rides", "events"] as const).map((t) => (
           <button key={t} type="button" onClick={() => setActiveTab(t)} aria-pressed={activeTab === t} className={`w-full rounded-xl py-2.5 transition-colors ${activeTab === t ? "bg-yellow shadow-sm" : "bg-white"}`}>
             <span className={`font-anton text-lg uppercase tracking-tight ${activeTab === t ? "text-[#0F1C3F]" : "text-slate-500"}`}>{t}</span>
@@ -32,7 +32,7 @@ const RideEventDetailStep = ({ updateStep, rides, events }: Props) => {
 
       <div className="flex flex-col gap-3 p-4">
         {data.map((item, index) => (
-          <article key={`${activeTab}-${item.title}-${index}`} className="rounded-2xl border border-slate-100 bg-white p-3.5 shadow-[0_8px_24px_rgba(20,36,90,0.08)] transition-shadow hover:shadow-[0_12px_30px_rgba(20,36,90,0.13)]">
+          <article data-scroll-reveal key={`${activeTab}-${item.title}-${index}`} className="rounded-2xl border border-[#dcebdd] bg-gradient-to-br from-[#fbfcf4] to-[#edf6ec] p-3.5 shadow-[0_8px_24px_rgba(19,83,57,0.08)] transition-shadow hover:shadow-[0_12px_30px_rgba(19,83,57,0.14)]">
             <div className="flex items-start gap-3">
               {item.img ? (
                 <img src={item.img} alt={item.title} className="size-[88px] shrink-0 rounded-xl object-cover" />
