@@ -19,7 +19,7 @@ const OutletDetail = ({ outlet, onBack }: { outlet: DiningOutlet; onBack: () => 
   );
 
   return (
-    <div className="min-h-screen bg-blue">
+    <div className="min-h-screen bg-[#f4f6fb]">
       <Header title="Dining & Menu" onBack={onBack} />
 
       {/* Hero image */}
@@ -127,7 +127,7 @@ const DiningMenuStep = ({ updateStep, data }: Props) => {
   }
 
   return (
-    <div className="min-h-screen bg-blue">
+    <div className="min-h-screen bg-[#f4f6fb]">
       <Header title="Dining & Menu" onBack={() => updateStep(steps.LANDING)} />
 
       <div className="flex flex-col gap-4 px-4 py-5">
@@ -136,7 +136,7 @@ const DiningMenuStep = ({ updateStep, data }: Props) => {
             key={`${outlet.name}-${i}`}
             type="button"
             onClick={() => setSelected(i)}
-            className="flex gap-3 rounded-2xl bg-white p-3 text-left shadow-[0_6px_18px_rgba(0,0,0,0.12)] transition active:scale-[0.99]"
+            className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3.5 text-left shadow-[0_8px_24px_rgba(20,36,90,0.08)] transition hover:shadow-[0_12px_30px_rgba(20,36,90,0.13)] active:scale-[0.99]"
           >
             {outlet.img ? (
               <img src={outlet.img} alt={outlet.name} className="size-[96px] shrink-0 rounded-xl object-cover" />
@@ -170,7 +170,7 @@ const DiningMenuStep = ({ updateStep, data }: Props) => {
           </button>
         ))}
         {(!data || data.length === 0) && (
-          <p className="font-mulish text-sm text-white/80">No dining outlets added yet.</p>
+          <p className="rounded-2xl bg-white p-5 text-center font-mulish text-sm text-slate-500 shadow-sm">No dining outlets added yet.</p>
         )}
       </div>
     </div>

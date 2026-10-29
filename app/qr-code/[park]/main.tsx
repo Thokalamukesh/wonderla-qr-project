@@ -152,8 +152,8 @@ const QrCodeMain = ({ initialConfig }: Props) => {
   };
 
   return (
-    <div className="flex min-h-screen justify-center bg-[#0a1026]">
-      <main className="w-full max-w-[480px] bg-blue">{renderSteps()}</main>
+    <div className="flex min-h-screen justify-center bg-[#e9edf7] sm:px-4 sm:py-5">
+      <main className="w-full max-w-[480px] overflow-hidden bg-[#f4f6fb] shadow-[0_16px_60px_rgba(20,36,90,0.12)] sm:rounded-[28px]">{renderSteps()}</main>
     </div>
   );
 };

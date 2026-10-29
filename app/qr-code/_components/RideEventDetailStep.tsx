@@ -19,20 +19,20 @@ const RideEventDetailStep = ({ updateStep, rides, events }: Props) => {
   const data: Array<MediaItem | EventItem> = activeTab === tabs.RIDES ? rides : events;
 
   return (
-    <div className="min-h-screen bg-blue">
+    <div className="min-h-screen bg-[#f4f6fb]">
       <Header title="Rides & Event Details" onBack={() => updateStep(steps.LANDING)} />
 
-      <div className="flex w-full items-stretch">
+      <div className="mx-4 mt-4 flex w-auto items-stretch rounded-2xl bg-white p-1.5 shadow-sm">
         {(["rides", "events"] as const).map((t) => (
-          <button key={t} type="button" onClick={() => setActiveTab(t)} aria-pressed={activeTab === t} className={`w-full py-3 transition-colors ${activeTab === t ? "bg-yellow" : "bg-blue"}`}>
-            <span className={`font-anton text-xl uppercase tracking-tight ${activeTab === t ? "text-[#0F1C3F]" : "text-white"}`}>{t}</span>
+          <button key={t} type="button" onClick={() => setActiveTab(t)} aria-pressed={activeTab === t} className={`w-full rounded-xl py-2.5 transition-colors ${activeTab === t ? "bg-yellow shadow-sm" : "bg-white"}`}>
+            <span className={`font-anton text-lg uppercase tracking-tight ${activeTab === t ? "text-[#0F1C3F]" : "text-slate-500"}`}>{t}</span>
           </button>
         ))}
       </div>
 
       <div className="flex flex-col gap-3 p-4">
         {data.map((item, index) => (
-          <article key={`${activeTab}-${item.title}-${index}`} className="rounded-2xl bg-white p-3 shadow-[0_6px_18px_rgba(0,0,0,0.12)]">
+          <article key={`${activeTab}-${item.title}-${index}`} className="rounded-2xl border border-slate-100 bg-white p-3.5 shadow-[0_8px_24px_rgba(20,36,90,0.08)] transition-shadow hover:shadow-[0_12px_30px_rgba(20,36,90,0.13)]">
             <div className="flex items-start gap-3">
               {item.img ? (
                 <img src={item.img} alt={item.title} className="size-[88px] shrink-0 rounded-xl object-cover" />
@@ -53,7 +53,7 @@ const RideEventDetailStep = ({ updateStep, rides, events }: Props) => {
             {activeTab === "rides" && item.kioskBookingEnabled && <KioskBookingCallout />}
           </article>
         ))}
-        {data.length === 0 && <p className="font-mulish text-sm text-white/80">Nothing added yet.</p>}
+        {data.length === 0 && <p className="rounded-2xl bg-white p-5 text-center font-mulish text-sm text-slate-500 shadow-sm">Nothing added yet.</p>}
       </div>
     </div>
   );

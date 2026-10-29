@@ -20,25 +20,25 @@ const RefreshButton = ({ onRefresh, refreshing }: { onRefresh?: () => void; refr
 );
 
 const MaintenanceLog = ({ updateStep, data, onRefresh, refreshing, refreshError }: Props) => (
-  <div className="min-h-screen bg-blue">
+  <div className="min-h-screen bg-[#f4f6fb]">
     <Header
       title="Maintenance Log"
       onBack={() => updateStep(steps.LANDING)}
       right={<RefreshButton onRefresh={onRefresh} refreshing={refreshing} />}
     />
-    {refreshError && <p role="status" className="px-4 pt-3 text-center font-mulish text-xs text-white">Could not refresh. Check your connection and try again.</p>}
+    {refreshError && <p role="status" className="mx-4 mt-3 rounded-xl bg-red-50 px-4 py-3 text-center font-mulish text-xs font-semibold text-red-700">Could not refresh. Check your connection and try again.</p>}
     <div className="px-4 py-6">
-      <div className="flex gap-2 rounded-t-2xl bg-[#0F1C3F] px-5 py-4">
+      <div className="flex gap-2 rounded-t-2xl bg-[#172b85] px-5 py-4">
         <div className="w-5/12"><p className="font-mulish text-xs font-bold text-white">Ride</p></div>
         <div className="w-4/12"><p className="font-mulish text-xs font-bold text-white">Last Service</p></div>
         <div className="w-3/12"><p className="text-center font-mulish text-xs font-bold text-white">Checks</p></div>
       </div>
-      <div className="overflow-hidden rounded-b-2xl bg-[#1D3298]">
+      <div className="overflow-hidden rounded-b-2xl border border-slate-200 bg-white shadow-[0_8px_24px_rgba(20,36,90,0.08)]">
         {(data ?? []).map((item, i) => (
-          <div key={`${item.ride}-${i}`} className="flex gap-2 border-b border-white/10 px-5 py-4 last:border-none">
-            <div className="w-5/12"><p className="font-mulish text-xs font-bold text-white">{item.ride}</p></div>
-            <div className="w-4/12"><p className="font-mulish text-xs text-white/90">{item.lastService}</p></div>
-            <div className="w-3/12"><p className="text-center font-mulish text-xs text-white/90">{item.checks}</p></div>
+          <div key={`${item.ride}-${i}`} className="flex gap-2 border-b border-slate-100 px-5 py-4 last:border-none even:bg-slate-50/70">
+            <div className="w-5/12"><p className="font-mulish text-xs font-bold text-slate-800">{item.ride}</p></div>
+            <div className="w-4/12"><p className="font-mulish text-xs text-slate-600">{item.lastService}</p></div>
+            <div className="w-3/12"><p className="text-center font-mulish text-xs text-slate-600">{item.checks}</p></div>
           </div>
         ))}
       </div>

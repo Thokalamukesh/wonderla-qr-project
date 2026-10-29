@@ -21,12 +21,12 @@ const RefreshButton = ({ onRefresh, refreshing }: { onRefresh?: () => void; refr
 );
 
 const RideWaitTimeStep = ({ updateStep, data, onRefresh, refreshing, refreshError }: Props) => (
-  <div className="min-h-screen bg-blue">
+  <div className="min-h-screen bg-[#f4f6fb]">
     <Header title="Live Ride Wait Time" onBack={() => updateStep(steps.LANDING)} right={<RefreshButton onRefresh={onRefresh} refreshing={refreshing} />} />
-    {refreshError && <p role="status" className="px-4 pt-3 text-center font-mulish text-xs text-white">Could not refresh. Check your connection and try again.</p>}
+    {refreshError && <p role="status" className="mx-4 mt-3 rounded-xl bg-red-50 px-4 py-3 text-center font-mulish text-xs font-semibold text-red-700">Could not refresh. Check your connection and try again.</p>}
     <div className="flex flex-col gap-3 px-4 py-5">
       {(data ?? []).map((item, i) => (
-        <article key={`${item.title}-${i}`} className="rounded-2xl bg-white p-3 shadow-[0_6px_18px_rgba(0,0,0,0.12)]">
+        <article key={`${item.title}-${i}`} className="rounded-2xl border border-slate-100 bg-white p-3.5 shadow-[0_8px_24px_rgba(20,36,90,0.08)]">
           <div className="flex items-start gap-3">
             {item.img ? (
               <img src={item.img} alt={item.title} className="size-[76px] shrink-0 rounded-xl object-cover" />

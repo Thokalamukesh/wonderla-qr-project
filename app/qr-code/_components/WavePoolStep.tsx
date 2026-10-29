@@ -9,11 +9,11 @@ interface Props {
 }
 
 const WavePoolStep = ({ updateStep, data }: Props) => (
-  <div className="min-h-screen bg-blue">
+  <div className="min-h-screen bg-[#f4f6fb]">
     <Header title="Wave Pool & Rain Dance" onBack={() => updateStep(steps.LANDING)} />
     <div className="flex flex-col gap-4 px-4 py-5">
       {(data ?? []).map((item, i) => (
-        <div key={`${item.title}-${i}`} className="overflow-hidden rounded-2xl bg-white shadow-[0_6px_18px_rgba(0,0,0,0.12)]">
+        <div key={`${item.title}-${i}`} className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_8px_24px_rgba(20,36,90,0.08)]">
           {item.img ? (
             <img src={item.img} alt={item.title} className="h-[150px] w-full object-cover" />
           ) : (
