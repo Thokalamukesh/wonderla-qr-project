@@ -25,6 +25,7 @@ const SafetyHygieneStep = ({ updateStep, data }: Props) => (
           </div>
         </div>
       ))}
+      {(!data || data.length === 0) && <p className="rounded-2xl border border-white/90 bg-gradient-to-br from-white/90 to-[#eaf1ff]/85 p-5 text-center font-mulish text-sm text-slate-500 shadow-sm">Safety information will be available here soon.</p>}
     </div>
   </div>
 );

@@ -44,6 +44,7 @@ const RideWaitTimeStep = ({ updateStep, data, onRefresh, refreshing, refreshErro
           {item.kioskBookingEnabled && <KioskBookingCallout />}
         </article>
       ))}
+      {(!data || data.length === 0) && <p className="rounded-2xl border border-white/90 bg-gradient-to-br from-white/90 to-[#eaf1ff]/85 p-5 text-center font-mulish text-sm text-slate-500 shadow-sm">Wait times are not available yet.</p>}
     </div>
   </div>
 );

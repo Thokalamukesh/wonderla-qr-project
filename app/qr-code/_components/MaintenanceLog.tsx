@@ -41,6 +41,7 @@ const MaintenanceLog = ({ updateStep, data, onRefresh, refreshing, refreshError 
             <div className="w-3/12"><p className="text-center font-mulish text-xs text-slate-600">{item.checks}</p></div>
           </div>
         ))}
+        {(!data || data.length === 0) && <p className="bg-gradient-to-br from-white/90 to-[#eaf1ff]/85 px-4 py-6 text-center font-mulish text-sm text-slate-500">No maintenance records are available yet.</p>}
       </div>
     </div>
   </div>

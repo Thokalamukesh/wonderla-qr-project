@@ -33,7 +33,7 @@ const OutletDetail = ({ outlet, onBack }: { outlet: DiningOutlet; onBack: () => 
         )}
       </div>
 
-      <div className="px-5 pt-4">
+      <div className="relative z-10 mx-4 -mt-3 rounded-2xl bg-gradient-to-br from-[#102b78] via-[#244bb0] to-[#477fdf] px-5 py-5 shadow-[0_16px_34px_rgba(24,61,154,0.24)]">
         <h1 className="font-anton text-[clamp(26px,8vw,36px)] uppercase leading-[0.95] tracking-tight text-white">
           {outlet.name}
         </h1>
@@ -42,7 +42,7 @@ const OutletDetail = ({ outlet, onBack }: { outlet: DiningOutlet; onBack: () => 
             href={outlet.directionsUrl}
             target="_blank"
             rel="noreferrer"
-            className="mt-1 inline-flex items-center gap-1 font-mulish text-sm font-extrabold uppercase text-yellow"
+            className="mt-1 inline-flex items-center gap-1 font-mulish text-sm font-extrabold uppercase text-[#c9dcff]"
           >
             Get Direction <span>›</span>
           </a>
@@ -66,7 +66,7 @@ const OutletDetail = ({ outlet, onBack }: { outlet: DiningOutlet; onBack: () => 
         <h2 className="text-center font-anton text-[clamp(30px,9vw,42px)] uppercase leading-none tracking-tight text-[#0F1C3F]">
           Explore Menu
         </h2>
-        <p className="mt-1 text-center font-mulish text-sm text-[#0F1C3F]/80">
+        <p className="mt-1 text-center font-mulish text-sm text-[#142653]/75">
           Awaken your inner foodie by diving into our irresistible menu options!
         </p>
 
@@ -112,7 +112,7 @@ const OutletDetail = ({ outlet, onBack }: { outlet: DiningOutlet; onBack: () => 
             </div>
           ))}
           {items.length === 0 && (
-            <p className="text-center font-mulish text-sm text-[#0F1C3F]/70">No items for this filter.</p>
+            <p className="rounded-xl border border-white/80 bg-white/70 p-4 text-center font-mulish text-sm text-[#142653]/75">No items for this filter.</p>
           )}
         </div>
       </div>
