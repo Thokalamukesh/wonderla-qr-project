@@ -1,7 +1,7 @@
 import React from "react";
 
 const KioskBookingCallout = () => (
-  <aside className="mt-3 flex items-start gap-3 rounded-xl border border-[#DCE4FF] bg-gradient-to-r from-[#F2F5FF] to-[#FBFCFF] p-3" aria-label="Kiosk slot booking information">
+  <aside className="mt-3 flex items-start gap-3 rounded-xl border border-[#dbe4f0] bg-[#f4f7fc] p-3" aria-label="Kiosk slot booking information">
     <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-yellow text-[#14245D] shadow-sm" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none" className="size-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M4 7.5A2.5 2.5 0 0 0 6.5 10v4A2.5 2.5 0 0 0 4 16.5V19h16v-2.5a2.5 2.5 0 0 1 0-5v-4A2.5 2.5 0 0 1 20 5H4v2.5Z" />

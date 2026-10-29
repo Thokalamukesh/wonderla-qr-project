@@ -19,7 +19,7 @@ const OutletDetail = ({ outlet, onBack }: { outlet: DiningOutlet; onBack: () => 
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f3f7ff] to-[#e5edff]">
+    <div className="min-h-screen bg-[#f1f5fb]">
       <Header title="Dining & Menu" onBack={onBack} />
 
       {/* Hero image */}
@@ -33,7 +33,7 @@ const OutletDetail = ({ outlet, onBack }: { outlet: DiningOutlet; onBack: () => 
         )}
       </div>
 
-      <div className="relative z-10 mx-4 -mt-3 rounded-2xl bg-gradient-to-br from-[#102b78] via-[#244bb0] to-[#477fdf] px-5 py-5 shadow-[0_16px_34px_rgba(24,61,154,0.24)]">
+      <div className="relative z-10 mx-4 -mt-3 rounded-2xl bg-[#244bb0] px-5 py-5 shadow-md">
         <h1 className="font-anton text-[clamp(26px,8vw,36px)] uppercase leading-[0.95] tracking-tight text-white">
           {outlet.name}
         </h1>
@@ -62,7 +62,7 @@ const OutletDetail = ({ outlet, onBack }: { outlet: DiningOutlet; onBack: () => 
       </div>
 
       {/* Explore menu (yellow section) */}
-      <div className="mt-5 rounded-t-[28px] bg-gradient-to-b from-[#dbe8ff] via-[#eaf1ff] to-[#d8e5ff] px-5 pb-10 pt-7">
+      <div className="mt-5 rounded-t-2xl border-t border-[#dbe4f0] bg-[#eaf0f8] px-5 pb-10 pt-7">
         <h2 className="text-center font-anton text-[clamp(30px,9vw,42px)] uppercase leading-none tracking-tight text-[#0F1C3F]">
           Explore Menu
         </h2>
@@ -78,7 +78,7 @@ const OutletDetail = ({ outlet, onBack }: { outlet: DiningOutlet; onBack: () => 
               type="button"
               onClick={() => setFilter(f)}
               className={`rounded-full px-4 py-1.5 font-mulish text-xs font-bold capitalize transition ${
-                filter === f ? "bg-gradient-to-r from-[#183d9a] to-[#477fdf] text-white shadow-md" : "bg-white/80 text-[#0F1C3F] ring-1 ring-white"
+                filter === f ? "bg-[#244bb0] text-white shadow-sm" : "bg-white text-[#0F1C3F] ring-1 ring-[#dbe4f0]"
               }`}
             >
               {f === "nonveg" ? "Non-Veg" : f}
@@ -91,7 +91,7 @@ const OutletDetail = ({ outlet, onBack }: { outlet: DiningOutlet; onBack: () => 
             <div
               key={`${it.name}-${i}`}
               data-scroll-reveal
-              className="flex items-center gap-3 rounded-2xl border border-white/90 bg-gradient-to-br from-white/90 to-[#eaf1ff]/85 p-3 shadow-sm backdrop-blur-xl"
+              className="flex items-center gap-3 rounded-xl border border-[#dbe4f0] bg-white p-3 shadow-sm"
             >
               {it.img ? (
                 <img src={it.img} alt={it.name} className="size-[64px] shrink-0 rounded-xl object-cover" />
@@ -128,7 +128,7 @@ const DiningMenuStep = ({ updateStep, data }: Props) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f3f7ff] to-[#e5edff]">
+    <div className="min-h-screen bg-[#f1f5fb]">
       <Header title="Dining & Menu" onBack={() => updateStep(steps.LANDING)} />
 
       <div className="flex flex-col gap-4 px-4 py-5">
@@ -138,7 +138,7 @@ const DiningMenuStep = ({ updateStep, data }: Props) => {
             type="button"
             onClick={() => setSelected(i)}
             data-scroll-reveal
-            className="flex gap-3 rounded-2xl border border-white/90 bg-gradient-to-br from-white/90 to-[#eaf1ff]/85 p-3.5 text-left shadow-[0_8px_24px_rgba(24,61,154,0.10)] backdrop-blur-xl transition hover:shadow-[0_12px_30px_rgba(24,61,154,0.18)] active:scale-[0.99]"
+            className="flex gap-3 rounded-2xl border border-[#dbe4f0] bg-white p-3.5 text-left shadow-sm transition hover:border-[#b7c9e8] hover:shadow-md active:scale-[0.99]"
           >
             {outlet.img ? (
               <img src={outlet.img} alt={outlet.name} className="size-[96px] shrink-0 rounded-xl object-cover" />

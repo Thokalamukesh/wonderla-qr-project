@@ -15,8 +15,8 @@ const QrCodeIndex = async () => {
   const parks = (await listParks()).filter((p) => p.active);
 
   return (
-    <main className="relative mx-auto min-h-screen max-w-[520px] overflow-hidden bg-gradient-to-b from-[#eff4ff] to-[#e2ebff] px-5 pb-10 pt-6 sm:px-8">
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-[310px] rounded-b-[44px] bg-gradient-to-br from-[#6da4ff] via-[#244bb0] to-[#102b78] shadow-[0_18px_40px_rgba(16,43,120,0.24)]" />
+    <main className="relative mx-auto min-h-screen max-w-[520px] overflow-hidden bg-[#f1f5fb] px-5 pb-10 pt-6 sm:px-8">
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-[310px] rounded-b-[32px] bg-[#244bb0] shadow-[0_8px_24px_rgba(16,43,120,0.16)]" />
       <div className="relative">
         <div className="mb-7 flex items-center justify-between">
           <img src="/wonderla/logo.png" alt="Wonderla" className="h-12 w-auto object-contain" />
@@ -33,7 +33,7 @@ const QrCodeIndex = async () => {
           <Link
             key={park.slug}
             href={`/qr-code/${park.slug}`}
-            className="group flex w-full items-center gap-4 rounded-2xl border border-white/90 bg-gradient-to-br from-white/90 to-[#eaf1ff]/85 p-4 shadow-[0_8px_24px_rgba(24,61,154,0.10)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-[#c3d5fb] hover:shadow-[0_14px_32px_rgba(24,61,154,0.18)] active:scale-[0.99]"
+            className="group flex w-full items-center gap-4 rounded-2xl border border-[#dbe4f0] bg-white p-4 shadow-sm transition hover:border-[#b7c9e8] hover:shadow-md active:scale-[0.99]"
           >
             <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-[#edf0ff] text-xl" aria-hidden="true">📍</span>
             <span className="min-w-0 flex-1">
@@ -44,7 +44,7 @@ const QrCodeIndex = async () => {
           </Link>
         ))}
         {parks.length === 0 && (
-          <p className="rounded-2xl bg-white p-5 text-center font-mulish text-sm leading-relaxed text-slate-600 shadow-sm">
+          <p className="rounded-2xl border border-[#dbe4f0] bg-white p-5 text-center font-mulish text-sm leading-relaxed text-slate-600 shadow-sm">
             No parks configured yet. Add one from the admin panel.
           </p>
         )}

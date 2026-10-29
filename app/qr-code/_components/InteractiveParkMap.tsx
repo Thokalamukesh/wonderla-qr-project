@@ -426,7 +426,7 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
         )}
       </div>
 
-      <aside className="relative z-10 min-h-0 overflow-y-auto overscroll-contain rounded-t-[28px] border-t border-white/90 bg-gradient-to-b from-[#f7f9ff]/95 to-[#eaf1ff]/95 px-4 pb-5 pt-2 shadow-[0_-8px_30px_rgba(24,61,154,0.14)] backdrop-blur-xl lg:rounded-none lg:border-l lg:border-t-0 lg:px-5 lg:pt-5 lg:shadow-none">
+      <aside className="relative z-10 min-h-0 overflow-y-auto overscroll-contain rounded-t-[24px] border-t border-[#dbe4f0] bg-[#f4f7fc] px-4 pb-5 pt-2 shadow-[0_-4px_16px_rgba(24,61,154,0.08)] lg:rounded-none lg:border-l lg:border-t-0 lg:px-5 lg:pt-5 lg:shadow-none">
         <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-[#d8d8d8] lg:hidden" aria-hidden="true" />
         <div className="mx-auto max-w-xl">
           <div className="flex items-center justify-between gap-3">
@@ -437,7 +437,7 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
             <span className="rounded-full bg-[#fff5c2] px-3 py-1.5 text-xs font-extrabold text-[#705900]">{places.length} places</span>
           </div>
 
-          <article className="mt-3 flex items-center gap-3 rounded-xl border border-white/90 bg-gradient-to-r from-white/90 to-[#eaf1ff]/85 px-3 py-2.5 shadow-sm backdrop-blur-xl">
+          <article className="mt-3 flex items-center gap-3 rounded-xl border border-[#dbe4f0] bg-white px-3 py-2.5 shadow-sm">
             <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#eaf2ff] text-[#1673e8]">●</span>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-bold text-[#191919]">Your location</p>
@@ -493,7 +493,7 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
                   disabled={!mapReady}
                   aria-pressed={isActive}
                   data-scroll-reveal
-                  className={`flex min-h-[58px] w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#477fdf] disabled:cursor-wait disabled:opacity-55 ${isActive ? "border-[#adc7f6] bg-gradient-to-r from-[#e1ebff] to-[#f6f8ff]" : "border-white/90 bg-white/80 hover:border-[#bfd1f6] hover:bg-[#edf3ff]"}`}
+                  className={`flex min-h-[58px] w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#477fdf] disabled:cursor-wait disabled:opacity-55 ${isActive ? "border-[#adc7f6] bg-[#eaf1ff]" : "border-[#dbe4f0] bg-white hover:border-[#bfd1f6] hover:bg-[#f7f9fd]"}`}
                 >
                   <span
                     className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#d1def7] bg-[#e4edff] bg-cover bg-center text-sm font-extrabold text-[#31508e]"
@@ -508,7 +508,7 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
                     <span className="block truncate text-sm font-bold text-[#222]">{place.name}</span>
                     <span className="mt-0.5 block text-xs text-[#858585]">{place.category}</span>
                   </span>
-                  <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-extrabold ${isActive ? "bg-gradient-to-r from-[#183d9a] to-[#477fdf] text-white" : "bg-[#e2ebff] text-[#244b9c]"}`}>
+                  <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-extrabold ${isActive ? "bg-[#244bb0] text-white" : "bg-[#e2ebff] text-[#244b9c]"}`}>
                     {isActive ? "Routing" : "Navigate"}
                   </span>
                 </button>

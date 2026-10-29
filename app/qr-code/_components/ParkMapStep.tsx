@@ -13,7 +13,7 @@ interface Props {
 }
 
 const ParkMapStep = ({ updateStep, parkName, places }: Props) => (
-  <div className="flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-gradient-to-b from-[#f3f7ff] to-[#e5edff]">
+  <div className="flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-[#f1f5fb]">
     <Header title="Park Map" onBack={() => updateStep(steps.LANDING)} />
     <div className="flex min-h-0 flex-1 px-0 pb-0 pt-0">
       <InteractiveParkMap parkName={parkName} places={places} />

@@ -20,7 +20,7 @@ const RefreshButton = ({ onRefresh, refreshing }: { onRefresh?: () => void; refr
 );
 
 const MaintenanceLog = ({ updateStep, data, onRefresh, refreshing, refreshError }: Props) => (
-  <div className="min-h-screen bg-gradient-to-b from-[#f3f7ff] to-[#e5edff]">
+  <div className="min-h-screen bg-[#f1f5fb]">
     <Header
       title="Maintenance Log"
       onBack={() => updateStep(steps.LANDING)}
@@ -28,7 +28,7 @@ const MaintenanceLog = ({ updateStep, data, onRefresh, refreshing, refreshError 
     />
     {refreshError && <p role="status" className="mx-4 mt-3 rounded-xl bg-red-50 px-4 py-3 text-center font-mulish text-xs font-semibold text-red-700">Could not refresh. Check your connection and try again.</p>}
     <div className="px-4 py-6">
-      <div className="flex gap-2 rounded-t-2xl bg-gradient-to-r from-[#102b78] to-[#477fdf] px-5 py-4">
+      <div className="flex gap-2 rounded-t-2xl bg-[#244bb0] px-5 py-4">
         <div className="w-5/12"><p className="font-mulish text-xs font-bold text-white">Ride</p></div>
         <div className="w-4/12"><p className="font-mulish text-xs font-bold text-white">Last Service</p></div>
         <div className="w-3/12"><p className="text-center font-mulish text-xs font-bold text-white">Checks</p></div>
@@ -41,7 +41,7 @@ const MaintenanceLog = ({ updateStep, data, onRefresh, refreshing, refreshError 
             <div className="w-3/12"><p className="text-center font-mulish text-xs text-slate-600">{item.checks}</p></div>
           </div>
         ))}
-        {(!data || data.length === 0) && <p className="bg-gradient-to-br from-white/90 to-[#eaf1ff]/85 px-4 py-6 text-center font-mulish text-sm text-slate-500">No maintenance records are available yet.</p>}
+        {(!data || data.length === 0) && <p className="bg-white px-4 py-6 text-center font-mulish text-sm text-slate-500">No maintenance records are available yet.</p>}
       </div>
     </div>
   </div>

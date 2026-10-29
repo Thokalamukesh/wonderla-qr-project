@@ -29,23 +29,23 @@ const LandingStep = ({ updateStep, parkName, logoUrl, heroImage, icons }: Props)
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f3f7ff] to-[#e5edff]">
+    <div className="min-h-screen bg-[#f1f5fb]">
       {/* Logo bar */}
-      <header className="flex justify-center border-b border-white/80 bg-white/75 px-4 py-2.5 shadow-sm backdrop-blur-xl">
+      <header className="flex justify-center border-b border-[#e1e8f2] bg-white px-4 py-2.5">
         <Wordmark logoUrl={logo} />
       </header>
 
       <div className="mx-auto max-w-[560px] px-4 pb-8 pt-4 sm:px-5 sm:pt-5">
         {/* Hero banner — single focal image, clean */}
-        <div className="relative h-[210px] overflow-hidden rounded-[26px] shadow-[0_18px_36px_rgba(15,31,100,0.2)] sm:h-[250px] sm:rounded-[30px]">
+        <div className="relative h-[210px] overflow-hidden rounded-2xl shadow-[0_8px_20px_rgba(15,31,100,0.14)] sm:h-[250px]">
           {heroImage ? (
             <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#6da4ff] via-[#244bb0] to-[#102b78]" />
+            <div className="absolute inset-0 bg-[#244bb0]" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0B1230]/95 via-[#0B1230]/25 to-[#0B1230]/5" />
+          <div className="absolute inset-0 bg-[#08164d]/45" />
           <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-            <span className="inline-block rounded-full border border-white/20 bg-white/15 px-3 py-1 font-mulish text-[10px] font-extrabold uppercase tracking-[0.16em] text-white backdrop-blur-sm">
+            <span className="inline-block rounded-full border border-white/35 bg-[#102b78]/70 px-3 py-1 font-mulish text-[10px] font-extrabold uppercase tracking-[0.16em] text-white">
               Scan • Explore • Enjoy
             </span>
             <h1 className="mt-2 font-anton text-[clamp(34px,9vw,48px)] uppercase leading-[0.92] tracking-tight text-white [text-shadow:0_2px_10px_rgba(0,0,0,0.5)]">
@@ -69,7 +69,7 @@ const LandingStep = ({ updateStep, parkName, logoUrl, heroImage, icons }: Props)
               aria-label={`${t.label}: ${t.subtitle}`}
               onClick={() => updateStep(t.step)}
               data-scroll-reveal
-              className="group flex min-h-[100px] items-start gap-2.5 rounded-2xl border border-white/90 bg-gradient-to-br from-white/90 to-[#eaf1ff]/85 p-3 text-left shadow-[0_8px_22px_rgba(24,61,154,0.10)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-[#c3d5fb] hover:shadow-[0_14px_28px_rgba(24,61,154,0.18)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#8bb6ff] sm:min-h-[108px] sm:gap-3 sm:p-3.5"
+              className="group flex min-h-[96px] items-start gap-2.5 rounded-2xl border border-[#dbe4f0] bg-white p-3 text-left shadow-sm transition hover:border-[#b7c9e8] hover:shadow-md active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#8bb6ff] sm:min-h-[104px] sm:gap-3 sm:p-3.5"
             >
               <span
                 className="flex size-10 shrink-0 items-center justify-center rounded-xl text-[22px] shadow-sm transition-transform group-hover:scale-105 sm:size-11"

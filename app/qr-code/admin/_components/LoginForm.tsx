@@ -37,12 +37,9 @@ const LoginForm = ({ onSuccess }: Props) => {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#08164d] via-[#183d9a] to-[#3c72d8] px-4 py-10">
-      <div aria-hidden="true" className="absolute -right-24 -top-28 size-96 rounded-full bg-[#75b6ff]/35 blur-3xl" />
-      <div aria-hidden="true" className="absolute -bottom-36 -left-20 size-[28rem] rounded-full bg-[#c3dcff]/20 blur-3xl" />
-      <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.22),transparent_42%)]" />
-      <form onSubmit={submit} className="relative w-full max-w-md rounded-[30px] border border-white/70 bg-white/90 p-6 shadow-[0_32px_100px_rgba(3,17,63,0.42)] backdrop-blur-2xl sm:p-9">
-        <div className="mb-7 flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#e8f1ff] to-[#cfe2ff] ring-1 ring-white shadow-inner">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#183d9a] px-4 py-10">
+      <form onSubmit={submit} className="relative w-full max-w-md rounded-2xl border border-[#d9e3f2] bg-white p-6 shadow-[0_16px_48px_rgba(3,17,63,0.24)] sm:p-9">
+        <div className="mb-7 flex size-14 items-center justify-center rounded-xl bg-[#eaf1ff] ring-1 ring-[#d9e3f2]">
           <img src="/wonderla/logo.png" alt="Wonderla" className="h-10 w-10 object-contain" />
         </div>
         <p className="mb-2 font-mulish text-[11px] font-extrabold uppercase tracking-[0.2em] text-[#315ec0]">Park management</p>
@@ -73,7 +70,7 @@ const LoginForm = ({ onSuccess }: Props) => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-gradient-to-r from-[#183d9a] via-[#315ec0] to-[#477fdf] py-3 text-sm font-extrabold text-white shadow-lg shadow-[#173d99]/25 transition hover:brightness-105 active:scale-[0.99] disabled:opacity-60"
+          className="w-full rounded-xl bg-[#244bb0] py-3 text-sm font-extrabold text-white shadow-sm transition hover:bg-[#1d3d96] active:scale-[0.99] disabled:opacity-60"
         >
           {loading ? "Signing in..." : "Sign in"}
         </button>

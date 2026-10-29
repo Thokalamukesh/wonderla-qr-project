@@ -181,7 +181,7 @@ const ParkEditor = ({ config, onSaved, onDeleted, canManagePark = true }: Props)
         </div>
       </div>
 
-      <section className="mb-6 flex flex-col items-center gap-4 rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white p-5 text-center sm:flex-row sm:text-left">
+      <section className="mb-6 flex flex-col items-center gap-4 rounded-xl border border-indigo-100 bg-indigo-50 p-5 text-center sm:flex-row sm:text-left">
         <div className="rounded-xl bg-white p-2 shadow-sm">
           {baseUrl && <img src={qrImageUrl} alt={`QR code for ${draft.name}`} width="144" height="144" className="block size-36" />}
         </div>

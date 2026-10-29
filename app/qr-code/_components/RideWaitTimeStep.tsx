@@ -21,12 +21,12 @@ const RefreshButton = ({ onRefresh, refreshing }: { onRefresh?: () => void; refr
 );
 
 const RideWaitTimeStep = ({ updateStep, data, onRefresh, refreshing, refreshError }: Props) => (
-  <div className="min-h-screen bg-gradient-to-b from-[#f3f7ff] to-[#e5edff]">
+  <div className="min-h-screen bg-[#f1f5fb]">
     <Header title="Live Ride Wait Time" onBack={() => updateStep(steps.LANDING)} right={<RefreshButton onRefresh={onRefresh} refreshing={refreshing} />} />
     {refreshError && <p role="status" className="mx-4 mt-3 rounded-xl bg-red-50 px-4 py-3 text-center font-mulish text-xs font-semibold text-red-700">Could not refresh. Check your connection and try again.</p>}
     <div className="flex flex-col gap-3 px-4 py-5">
       {(data ?? []).map((item, i) => (
-        <article data-scroll-reveal key={`${item.title}-${i}`} className="rounded-2xl border border-white/90 bg-gradient-to-br from-white/90 to-[#eaf1ff]/85 p-3.5 shadow-[0_8px_24px_rgba(24,61,154,0.10)] backdrop-blur-xl">
+        <article data-scroll-reveal key={`${item.title}-${i}`} className="rounded-2xl border border-[#dbe4f0] bg-white p-3.5 shadow-sm">
           <div className="flex items-start gap-3">
             {item.img ? (
               <img src={item.img} alt={item.title} className="size-[76px] shrink-0 rounded-xl object-cover" />
@@ -44,7 +44,7 @@ const RideWaitTimeStep = ({ updateStep, data, onRefresh, refreshing, refreshErro
           {item.kioskBookingEnabled && <KioskBookingCallout />}
         </article>
       ))}
-      {(!data || data.length === 0) && <p className="rounded-2xl border border-white/90 bg-gradient-to-br from-white/90 to-[#eaf1ff]/85 p-5 text-center font-mulish text-sm text-slate-500 shadow-sm">Wait times are not available yet.</p>}
+      {(!data || data.length === 0) && <p className="rounded-2xl border border-[#dbe4f0] bg-white p-5 text-center font-mulish text-sm text-slate-500 shadow-sm">Wait times are not available yet.</p>}
     </div>
   </div>
 );
