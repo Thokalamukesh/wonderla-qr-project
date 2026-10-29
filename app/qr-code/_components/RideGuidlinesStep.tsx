@@ -9,11 +9,11 @@ interface Props {
 }
 
 const RideGuidlinesStep = ({ updateStep, data }: Props) => (
-  <div className="min-h-screen bg-gradient-to-b from-[#f3f8ef] to-[#eaf3e8]">
+  <div className="min-h-screen bg-gradient-to-b from-[#f3f7ff] to-[#e5edff]">
     <Header title="Ride Guidelines" onBack={() => updateStep(steps.LANDING)} />
     <div className="flex flex-col gap-3 px-4 py-5">
       {(data ?? []).map((item, i) => (
-        <div data-scroll-reveal key={`${item.title}-${i}`} className="rounded-2xl border border-[#dcebdd] bg-gradient-to-br from-[#fbfcf4] to-[#edf6ec] p-4 shadow-[0_8px_24px_rgba(19,83,57,0.08)]">
+        <div data-scroll-reveal key={`${item.title}-${i}`} className="rounded-2xl border border-white/90 bg-gradient-to-br from-white/90 to-[#eaf1ff]/85 p-4 shadow-[0_8px_24px_rgba(24,61,154,0.10)] backdrop-blur-xl">
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-anton text-lg uppercase tracking-tight text-[#0F1C3F]">{item.title}</h3>
             {item.minHeight && (

@@ -6,10 +6,10 @@
   --font-mulish: "Mulish", system-ui, sans-serif;
   --font-anton: "Anton", system-ui, sans-serif;
   --font-oswald: "Oswald", system-ui, sans-serif;
-  --wonderla-forest: #176b4a;
-  --wonderla-deep: #0e4c38;
-  --wonderla-mint: #edf7ef;
-  --wonderla-cream: #f5f7ed;
+  --wonderla-blue: #183d9a;
+  --wonderla-blue-light: #477fdf;
+  --wonderla-glass: rgba(255, 255, 255, 0.84);
+  --wonderla-glass-tint: rgba(234, 241, 255, 0.82);
 }
 
 html,

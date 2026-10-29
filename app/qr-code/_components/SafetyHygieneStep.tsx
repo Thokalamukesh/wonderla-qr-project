@@ -9,11 +9,11 @@ interface Props {
 }
 
 const SafetyHygieneStep = ({ updateStep, data }: Props) => (
-  <div className="min-h-screen bg-gradient-to-b from-[#f3f8ef] to-[#eaf3e8]">
+  <div className="min-h-screen bg-gradient-to-b from-[#f3f7ff] to-[#e5edff]">
     <Header title="Safety & Hygiene" onBack={() => updateStep(steps.LANDING)} />
     <div className="flex flex-col gap-3 px-4 py-5">
       {(data ?? []).map((item, i) => (
-        <div data-scroll-reveal key={`${item.title}-${i}`} className="flex gap-3 rounded-2xl border border-[#dcebdd] bg-gradient-to-br from-[#fbfcf4] to-[#edf6ec] p-3.5 shadow-[0_8px_24px_rgba(19,83,57,0.08)]">
+        <div data-scroll-reveal key={`${item.title}-${i}`} className="flex gap-3 rounded-2xl border border-white/90 bg-gradient-to-br from-white/90 to-[#eaf1ff]/85 p-3.5 shadow-[0_8px_24px_rgba(24,61,154,0.10)] backdrop-blur-xl">
           {item.img ? (
             <img src={item.img} alt={item.title} className="size-[90px] shrink-0 rounded-xl object-cover" />
           ) : (

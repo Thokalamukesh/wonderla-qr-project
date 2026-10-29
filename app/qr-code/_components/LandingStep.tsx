@@ -18,20 +18,20 @@ const LandingStep = ({ updateStep, parkName, logoUrl, heroImage, icons }: Props)
   const tileIcons = { ...DEFAULT_LANDING_ICONS, ...(icons || {}) };
 
   const tiles: Tile[] = [
-    { icon: "parkMap", label: "Park Map", subtitle: "Find rides & facilities", step: steps.PARK_MAP, color: "#2A41B1", tint: "#E7ECFF" },
-    { icon: "ridesEvents", label: "Rides & Events", subtitle: "Explore rides and shows", step: steps.RIDE_EVENT_DETAILS, color: "#EA580C", tint: "#FFEEE2" },
-    { icon: "dining", label: "Dining & Menu", subtitle: "Food, menus & prices", step: steps.DINING_MENU, color: "#DB2777", tint: "#FFE7F1" },
-    { icon: "waitTimes", label: "Live Wait Times", subtitle: "Current ride queues", step: steps.LIVE_RIDE_WAIT_TIME, color: "#15803D", tint: "#E4F7EA" },
-    { icon: "guidelines", label: "Ride Guidelines", subtitle: "Height limits & rules", step: steps.RIDE_GUIDELINES, color: "#4F46E5", tint: "#ECEBFF" },
-    { icon: "wavePool", label: "Wave Pool & Rain Dance", subtitle: "Sessions & timings", step: steps.WAVE_POOL_RAIN_DANCE, color: "#0E7490", tint: "#E0F7FB" },
-    { icon: "safety", label: "Safety & Hygiene", subtitle: "Guest safety information", step: steps.SAFETY_AND_HYGIENE_INFO, color: "#047857", tint: "#E2F6EF" },
-    { icon: "maintenance", label: "Maintenance Log", subtitle: "Ride service records", step: steps.MAINTENANCE_LOG, color: "#475569", tint: "#EEF1F5" },
+    { icon: "parkMap", label: "Park Map", subtitle: "Find rides & facilities", step: steps.PARK_MAP, color: "#244bb0", tint: "#e4edff" },
+    { icon: "ridesEvents", label: "Rides & Events", subtitle: "Explore rides and shows", step: steps.RIDE_EVENT_DETAILS, color: "#315ec0", tint: "#e7efff" },
+    { icon: "dining", label: "Dining & Menu", subtitle: "Food, menus & prices", step: steps.DINING_MENU, color: "#426fd0", tint: "#eaf1ff" },
+    { icon: "waitTimes", label: "Live Wait Times", subtitle: "Current ride queues", step: steps.LIVE_RIDE_WAIT_TIME, color: "#183d9a", tint: "#e2ebff" },
+    { icon: "guidelines", label: "Ride Guidelines", subtitle: "Height limits & rules", step: steps.RIDE_GUIDELINES, color: "#355cb8", tint: "#e8eeff" },
+    { icon: "wavePool", label: "Wave Pool & Rain Dance", subtitle: "Sessions & timings", step: steps.WAVE_POOL_RAIN_DANCE, color: "#3270bb", tint: "#e4f2ff" },
+    { icon: "safety", label: "Safety & Hygiene", subtitle: "Guest safety information", step: steps.SAFETY_AND_HYGIENE_INFO, color: "#315ec0", tint: "#e7efff" },
+    { icon: "maintenance", label: "Maintenance Log", subtitle: "Ride service records", step: steps.MAINTENANCE_LOG, color: "#405986", tint: "#eaf0fa" },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f4f8ef] to-[#e9f3e8]">
+    <div className="min-h-screen bg-gradient-to-b from-[#f3f7ff] to-[#e5edff]">
       {/* Logo bar */}
-      <header className="flex justify-center border-b border-[#dcebdd] bg-[#f8faef] px-4 py-2.5 shadow-sm">
+      <header className="flex justify-center border-b border-white/80 bg-white/75 px-4 py-2.5 shadow-sm backdrop-blur-xl">
         <Wordmark logoUrl={logo} />
       </header>
 
@@ -41,7 +41,7 @@ const LandingStep = ({ updateStep, parkName, logoUrl, heroImage, icons }: Props)
           {heroImage ? (
             <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#4ba975] via-[#176b4a] to-[#0e4c38]" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#6da4ff] via-[#244bb0] to-[#102b78]" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-[#0B1230]/95 via-[#0B1230]/25 to-[#0B1230]/5" />
           <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
@@ -56,7 +56,7 @@ const LandingStep = ({ updateStep, parkName, logoUrl, heroImage, icons }: Props)
         </div>
 
         {/* Section heading */}
-        <h2 className="mb-3 mt-6 font-anton text-xl uppercase tracking-tight text-[#17234a] sm:mt-7">
+        <h2 className="mb-3 mt-6 font-anton text-xl uppercase tracking-tight text-[#142653] sm:mt-7">
           Explore the Park
         </h2>
 
@@ -69,7 +69,7 @@ const LandingStep = ({ updateStep, parkName, logoUrl, heroImage, icons }: Props)
               aria-label={`${t.label}: ${t.subtitle}`}
               onClick={() => updateStep(t.step)}
               data-scroll-reveal
-              className="group flex min-h-[100px] items-start gap-2.5 rounded-2xl border border-[#dcebdd] bg-gradient-to-br from-[#fbfcf3] to-[#edf6ec] p-3 text-left shadow-[0_8px_22px_rgba(19,83,57,0.08)] transition hover:-translate-y-0.5 hover:border-[#b8d9c1] hover:shadow-[0_14px_28px_rgba(19,83,57,0.15)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow sm:min-h-[108px] sm:gap-3 sm:p-3.5"
+              className="group flex min-h-[100px] items-start gap-2.5 rounded-2xl border border-white/90 bg-gradient-to-br from-white/90 to-[#eaf1ff]/85 p-3 text-left shadow-[0_8px_22px_rgba(24,61,154,0.10)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-[#c3d5fb] hover:shadow-[0_14px_28px_rgba(24,61,154,0.18)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#8bb6ff] sm:min-h-[108px] sm:gap-3 sm:p-3.5"
             >
               <span
                 className="flex size-10 shrink-0 items-center justify-center rounded-xl text-[22px] shadow-sm transition-transform group-hover:scale-105 sm:size-11"
@@ -89,7 +89,7 @@ const LandingStep = ({ updateStep, parkName, logoUrl, heroImage, icons }: Props)
           ))}
         </div>
 
-        <p className="mt-8 text-center font-mulish text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-400">
+        <p className="mt-8 text-center font-mulish text-[11px] font-semibold uppercase tracking-[0.25em] text-[#7d8eae]">
           Have a Wonder-ful day!
         </p>
       </div>

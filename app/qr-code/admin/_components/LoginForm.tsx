@@ -37,18 +37,21 @@ const LoginForm = ({ onSuccess }: Props) => {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#101c4b] px-4 py-10">
-      <div aria-hidden="true" className="absolute -right-24 -top-28 size-80 rounded-full bg-[#364fc8]/50 blur-3xl" />
-      <div aria-hidden="true" className="absolute -bottom-32 -left-20 size-80 rounded-full bg-[#ffd400]/15 blur-3xl" />
-      <form onSubmit={submit} className="relative w-full max-w-md rounded-[28px] border border-white/60 bg-white p-6 shadow-[0_30px_90px_rgba(0,0,0,0.3)] sm:p-9">
-        <img src="/wonderla/logo.png" alt="Wonderla" className="mb-7 h-12 w-auto object-contain object-left" />
-        <p className="mb-2 font-mulish text-[11px] font-extrabold uppercase tracking-[0.2em] text-indigo-600">Park management</p>
-        <h1 className="mb-2 text-2xl font-extrabold tracking-tight text-slate-900">Welcome back</h1>
-        <p className="mb-7 text-sm leading-relaxed text-slate-500">Sign in to manage park information and guest experiences.</p>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#08164d] via-[#183d9a] to-[#3c72d8] px-4 py-10">
+      <div aria-hidden="true" className="absolute -right-24 -top-28 size-96 rounded-full bg-[#75b6ff]/35 blur-3xl" />
+      <div aria-hidden="true" className="absolute -bottom-36 -left-20 size-[28rem] rounded-full bg-[#c3dcff]/20 blur-3xl" />
+      <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.22),transparent_42%)]" />
+      <form onSubmit={submit} className="relative w-full max-w-md rounded-[30px] border border-white/70 bg-white/90 p-6 shadow-[0_32px_100px_rgba(3,17,63,0.42)] backdrop-blur-2xl sm:p-9">
+        <div className="mb-7 flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#e8f1ff] to-[#cfe2ff] ring-1 ring-white shadow-inner">
+          <img src="/wonderla/logo.png" alt="Wonderla" className="h-10 w-10 object-contain" />
+        </div>
+        <p className="mb-2 font-mulish text-[11px] font-extrabold uppercase tracking-[0.2em] text-[#315ec0]">Park management</p>
+        <h1 className="mb-2 text-2xl font-extrabold tracking-tight text-[#102452]">Welcome back</h1>
+        <p className="mb-7 text-sm leading-relaxed text-slate-600">Sign in to manage park information and guest experiences.</p>
 
         <label className="mb-1.5 block text-xs font-bold text-slate-700">Username</label>
         <input
-          className="mb-5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100"
+          className="mb-5 w-full rounded-xl border border-[#cbd9f0] bg-white/75 px-3.5 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-[#4774d2] focus:bg-white focus:ring-4 focus:ring-[#4774d2]/15"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           autoComplete="username"
@@ -58,7 +61,7 @@ const LoginForm = ({ onSuccess }: Props) => {
         <label className="mb-1.5 block text-xs font-bold text-slate-700">Password</label>
         <input
           type="password"
-          className="mb-5 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100"
+          className="mb-5 w-full rounded-xl border border-[#cbd9f0] bg-white/75 px-3.5 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-[#4774d2] focus:bg-white focus:ring-4 focus:ring-[#4774d2]/15"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="current-password"
@@ -70,7 +73,7 @@ const LoginForm = ({ onSuccess }: Props) => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-[#2A41B1] py-3 text-sm font-extrabold text-white shadow-lg shadow-indigo-900/20 transition hover:bg-[#20358f] active:scale-[0.99] disabled:opacity-60"
+          className="w-full rounded-xl bg-gradient-to-r from-[#183d9a] via-[#315ec0] to-[#477fdf] py-3 text-sm font-extrabold text-white shadow-lg shadow-[#173d99]/25 transition hover:brightness-105 active:scale-[0.99] disabled:opacity-60"
         >
           {loading ? "Signing in..." : "Sign in"}
         </button>

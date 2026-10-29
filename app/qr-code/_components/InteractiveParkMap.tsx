@@ -426,24 +426,24 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
         )}
       </div>
 
-      <aside className="relative z-10 min-h-0 overflow-y-auto overscroll-contain rounded-t-[28px] border-t border-[#dcebdd] bg-gradient-to-b from-[#f7faef] to-[#edf6ec] px-4 pb-5 pt-2 shadow-[0_-8px_30px_rgba(19,83,57,0.12)] lg:rounded-none lg:border-l lg:border-t-0 lg:px-5 lg:pt-5 lg:shadow-none">
+      <aside className="relative z-10 min-h-0 overflow-y-auto overscroll-contain rounded-t-[28px] border-t border-white/90 bg-gradient-to-b from-[#f7f9ff]/95 to-[#eaf1ff]/95 px-4 pb-5 pt-2 shadow-[0_-8px_30px_rgba(24,61,154,0.14)] backdrop-blur-xl lg:rounded-none lg:border-l lg:border-t-0 lg:px-5 lg:pt-5 lg:shadow-none">
         <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-[#d8d8d8] lg:hidden" aria-hidden="true" />
         <div className="mx-auto max-w-xl">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#176b4a]">Explore Wonderla</p>
-              <h1 className="mt-0.5 text-xl font-extrabold tracking-tight text-[#183d2d]">Available in the park</h1>
+              <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#315ec0]">Explore Wonderla</p>
+              <h1 className="mt-0.5 text-xl font-extrabold tracking-tight text-[#142653]">Available in the park</h1>
             </div>
             <span className="rounded-full bg-[#fff5c2] px-3 py-1.5 text-xs font-extrabold text-[#705900]">{places.length} places</span>
           </div>
 
-          <article className="mt-3 flex items-center gap-3 rounded-xl border border-[#dcebdd] bg-gradient-to-r from-[#f8fbf1] to-[#eaf5e8] px-3 py-2.5">
+          <article className="mt-3 flex items-center gap-3 rounded-xl border border-white/90 bg-gradient-to-r from-white/90 to-[#eaf1ff]/85 px-3 py-2.5 shadow-sm backdrop-blur-xl">
             <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#eaf2ff] text-[#1673e8]">●</span>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-bold text-[#191919]">Your location</p>
               <p className="truncate text-xs text-[#777]">{locationStatus}</p>
             </div>
-            <span className={`size-2.5 shrink-0 rounded-full ${userLocation ? "bg-emerald-500" : "bg-amber-400"}`} />
+            <span className={`size-2.5 shrink-0 rounded-full ${userLocation ? "bg-[#477fdf]" : "bg-slate-300"}`} />
           </article>
 
           {activeDestination && (
@@ -493,10 +493,10 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
                   disabled={!mapReady}
                   aria-pressed={isActive}
                   data-scroll-reveal
-                  className={`flex min-h-[58px] w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#176b4a] disabled:cursor-wait disabled:opacity-55 ${isActive ? "border-[#6aad83] bg-gradient-to-r from-[#e2f3e2] to-[#f1f7e8]" : "border-[#dcebdd] bg-[#f9fbf2] hover:border-[#a8d0b3] hover:bg-[#eef7eb]"}`}
+                  className={`flex min-h-[58px] w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#477fdf] disabled:cursor-wait disabled:opacity-55 ${isActive ? "border-[#adc7f6] bg-gradient-to-r from-[#e1ebff] to-[#f6f8ff]" : "border-white/90 bg-white/80 hover:border-[#bfd1f6] hover:bg-[#edf3ff]"}`}
                 >
                   <span
-                    className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#cfe3cf] bg-[#e4f0d9] bg-cover bg-center text-sm font-extrabold text-[#315e41]"
+                    className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#d1def7] bg-[#e4edff] bg-cover bg-center text-sm font-extrabold text-[#31508e]"
                     style={{
                       backgroundImage: `url("${place.avatarImage || "/wonderla/parks/bengaluru-layout.jpg"}")`,
                       backgroundSize: place.avatarImage ? "cover" : "350% auto",
@@ -508,7 +508,7 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
                     <span className="block truncate text-sm font-bold text-[#222]">{place.name}</span>
                     <span className="mt-0.5 block text-xs text-[#858585]">{place.category}</span>
                   </span>
-                  <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-extrabold ${isActive ? "bg-gradient-to-r from-[#176b4a] to-[#31946a] text-white" : "bg-[#d9edc9] text-[#27523a]"}`}>
+                  <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-extrabold ${isActive ? "bg-gradient-to-r from-[#183d9a] to-[#477fdf] text-white" : "bg-[#e2ebff] text-[#244b9c]"}`}>
                     {isActive ? "Routing" : "Navigate"}
                   </span>
                 </button>

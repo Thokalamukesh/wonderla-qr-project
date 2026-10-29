@@ -153,8 +153,8 @@ const QrCodeMain = ({ initialConfig }: Props) => {
   };
 
   return (
-    <div className="flex min-h-screen justify-center bg-gradient-to-br from-[#d9ead9] via-[#eff4e8] to-[#dcebe0] sm:px-4 sm:py-5">
-      <main data-guest-experience className="w-full max-w-[480px] overflow-hidden bg-gradient-to-b from-[#f4f8ef] via-[#eef6ef] to-[#f4f6ed] shadow-[0_16px_60px_rgba(18,76,53,0.14)] sm:rounded-[28px]">
+    <div className="flex min-h-screen justify-center bg-gradient-to-br from-[#dce8ff] via-[#eef3ff] to-[#d4e2ff] sm:px-4 sm:py-5">
+      <main data-guest-experience className="w-full max-w-[480px] overflow-hidden bg-gradient-to-b from-[#f4f7ff] via-[#edf3ff] to-[#e7efff] shadow-[0_16px_60px_rgba(20,54,130,0.18)] sm:rounded-[28px]">
         <ScrollRevealEffects />
         {renderSteps()}
       </main>

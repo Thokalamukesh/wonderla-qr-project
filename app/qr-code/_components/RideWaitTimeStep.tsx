@@ -21,12 +21,12 @@ const RefreshButton = ({ onRefresh, refreshing }: { onRefresh?: () => void; refr
 );
 
 const RideWaitTimeStep = ({ updateStep, data, onRefresh, refreshing, refreshError }: Props) => (
-  <div className="min-h-screen bg-gradient-to-b from-[#f3f8ef] to-[#eaf3e8]">
+  <div className="min-h-screen bg-gradient-to-b from-[#f3f7ff] to-[#e5edff]">
     <Header title="Live Ride Wait Time" onBack={() => updateStep(steps.LANDING)} right={<RefreshButton onRefresh={onRefresh} refreshing={refreshing} />} />
     {refreshError && <p role="status" className="mx-4 mt-3 rounded-xl bg-red-50 px-4 py-3 text-center font-mulish text-xs font-semibold text-red-700">Could not refresh. Check your connection and try again.</p>}
     <div className="flex flex-col gap-3 px-4 py-5">
       {(data ?? []).map((item, i) => (
-        <article data-scroll-reveal key={`${item.title}-${i}`} className="rounded-2xl border border-[#dcebdd] bg-gradient-to-br from-[#fbfcf4] to-[#edf6ec] p-3.5 shadow-[0_8px_24px_rgba(19,83,57,0.08)]">
+        <article data-scroll-reveal key={`${item.title}-${i}`} className="rounded-2xl border border-white/90 bg-gradient-to-br from-white/90 to-[#eaf1ff]/85 p-3.5 shadow-[0_8px_24px_rgba(24,61,154,0.10)] backdrop-blur-xl">
           <div className="flex items-start gap-3">
             {item.img ? (
               <img src={item.img} alt={item.title} className="size-[76px] shrink-0 rounded-xl object-cover" />
@@ -37,7 +37,7 @@ const RideWaitTimeStep = ({ updateStep, data, onRefresh, refreshing, refreshErro
               <h3 className="font-anton text-lg uppercase tracking-tight text-[#0F1C3F]">{item.title}</h3>
               <p className="font-mulish text-xs text-[#0F1C3F]/70">{item.description}</p>
             </div>
-            <span className={`shrink-0 rounded-full px-3 py-1 font-mulish text-xs font-bold text-white ${item.time >= 20 ? "bg-[#E14F1B]" : item.time >= 10 ? "bg-blue" : "bg-[#0B8043]"}`}>
+            <span className={`shrink-0 rounded-full px-3 py-1 font-mulish text-xs font-bold text-white ${item.time >= 20 ? "bg-[#E14F1B]" : item.time >= 10 ? "bg-blue" : "bg-[#477fdf]"}`}>
               {item.time} min
             </span>
           </div>
