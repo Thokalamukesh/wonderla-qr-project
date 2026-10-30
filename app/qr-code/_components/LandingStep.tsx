@@ -37,13 +37,13 @@ const LandingStep = ({ updateStep, parkName, logoUrl, heroImage, icons }: Props)
 
       <div className="mx-auto max-w-[560px] px-4 pb-8 pt-4 sm:px-5 sm:pt-5">
         {/* Hero banner — single focal image, clean */}
-        <div className="relative h-[238px] overflow-hidden rounded-[24px] border border-[#1c3f9d] bg-[#183d9a] shadow-[0_12px_28px_rgba(15,31,100,0.2)] sm:h-[275px]">
+        <div className="relative aspect-[16/9] w-full min-h-[190px] max-h-[275px] overflow-hidden rounded-[24px] border border-[#d4deed] bg-[#183d9a] shadow-[0_10px_24px_rgba(15,31,100,0.16)]">
           {heroImage ? (
-            <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover saturate-[0.65]" />
+            <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
           ) : (
             <div className="absolute inset-0 bg-[#244bb0]" />
           )}
-          <div className="absolute inset-0 bg-[#102b78]/80" />
+          <div className="absolute inset-0 bg-black/35" />
           <div aria-hidden="true" className="absolute -right-12 -top-14 size-56 rounded-full border-[28px] border-white/10 sm:size-64" />
           <div aria-hidden="true" className="absolute right-10 top-12 size-20 rounded-full border border-white/20 sm:right-14 sm:top-16 sm:size-24" />
           <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7">
