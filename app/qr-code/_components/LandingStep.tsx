@@ -45,9 +45,6 @@ const LandingStep = ({ updateStep, parkName, logoUrl, heroImage, icons }: Props)
           )}
           <div className="absolute inset-0 bg-[#08164d]/45" />
           <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-            <span className="inline-block rounded-full border border-white/35 bg-[#102b78]/70 px-3 py-1 font-mulish text-[10px] font-extrabold uppercase tracking-[0.16em] text-white">
-              Scan • Explore • Enjoy
-            </span>
             <h1 className="mt-2 font-anton text-[clamp(34px,9vw,48px)] uppercase leading-[0.92] tracking-tight text-white [text-shadow:0_2px_10px_rgba(0,0,0,0.5)]">
               Welcome to<br />Wonderla
             </h1>
