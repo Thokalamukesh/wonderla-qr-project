@@ -16,13 +16,17 @@ html,
 body {
   padding: 0;
   margin: 0;
-  overflow-x: hidden;
+  min-height: 100%;
+  overflow-x: clip;
   -webkit-text-size-adjust: 100%;
+  overscroll-behavior-y: auto;
   font-family: var(--font-mulish);
   color: #101a38;
   background: #f4f6fb;
   text-rendering: optimizeLegibility;
 }
+
+body { min-height: 100vh; }
 
 * { box-sizing: border-box; }
 
@@ -49,6 +53,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .mulish,
 .font-mulish {
   font-family: var(--font-mulish);
+}
+
+.park-map-scroll-panel {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 [data-scroll-reveal] {

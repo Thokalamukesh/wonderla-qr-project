@@ -426,7 +426,7 @@ export default function InteractiveParkMap({ parkName = "Wonderla Bengaluru", pl
         )}
       </div>
 
-      <aside className="relative z-10 min-h-0 overflow-y-auto overscroll-contain rounded-t-[24px] border-t border-[#dbe4f0] bg-[#f4f7fc] px-4 pb-5 pt-2 shadow-[0_-4px_16px_rgba(24,61,154,0.08)] lg:rounded-none lg:border-l lg:border-t-0 lg:px-5 lg:pt-5 lg:shadow-none">
+      <aside className="park-map-scroll-panel relative z-10 min-h-0 overflow-y-auto overscroll-contain rounded-t-[24px] border-t border-[#dbe4f0] bg-[#f4f7fc] px-4 pb-5 pt-2 shadow-[0_-4px_16px_rgba(24,61,154,0.08)] lg:rounded-none lg:border-l lg:border-t-0 lg:px-5 lg:pt-5 lg:shadow-none">
         <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-[#d8d8d8] lg:hidden" aria-hidden="true" />
         <div className="mx-auto max-w-xl">
           <div className="flex items-center justify-between gap-3">
