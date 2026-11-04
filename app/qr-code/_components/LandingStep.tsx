@@ -11,90 +11,105 @@ interface Props {
   heroImage?: string;
 }
 
-interface Tile { icon: keyof LandingIcons; label: string; subtitle: string; step: StepValue; color: string; tint: string; }
+interface Tile {
+  icon: keyof LandingIcons;
+  label: string;
+  subtitle: string;
+  step: StepValue;
+}
 
 const LandingStep = ({ updateStep, parkName, logoUrl, heroImage, icons }: Props) => {
-  const logo = logoUrl || "/wonderla/logo.png";
   const tileIcons = { ...DEFAULT_LANDING_ICONS, ...(icons || {}) };
-
   const tiles: Tile[] = [
-    { icon: "parkMap", label: "Park Map", subtitle: "Find rides & facilities", step: steps.PARK_MAP, color: "#244bb0", tint: "#e4edff" },
-    { icon: "ridesEvents", label: "Rides & Events", subtitle: "Explore rides and shows", step: steps.RIDE_EVENT_DETAILS, color: "#315ec0", tint: "#e7efff" },
-    { icon: "dining", label: "Dining & Menu", subtitle: "Food, menus & prices", step: steps.DINING_MENU, color: "#426fd0", tint: "#eaf1ff" },
-    { icon: "waitTimes", label: "Live Wait Times", subtitle: "Current ride queues", step: steps.LIVE_RIDE_WAIT_TIME, color: "#183d9a", tint: "#e2ebff" },
-    { icon: "guidelines", label: "Ride Guidelines", subtitle: "Height limits & rules", step: steps.RIDE_GUIDELINES, color: "#355cb8", tint: "#e8eeff" },
-    { icon: "wavePool", label: "Wave Pool & Rain Dance", subtitle: "Sessions & timings", step: steps.WAVE_POOL_RAIN_DANCE, color: "#3270bb", tint: "#e4f2ff" },
-    { icon: "safety", label: "Safety & Hygiene", subtitle: "Guest safety information", step: steps.SAFETY_AND_HYGIENE_INFO, color: "#315ec0", tint: "#e7efff" },
-    { icon: "maintenance", label: "Maintenance Log", subtitle: "Ride service records", step: steps.MAINTENANCE_LOG, color: "#405986", tint: "#eaf0fa" },
+    { icon: "ridesEvents", label: "Rides & events", subtitle: "Find your next thrill", step: steps.RIDE_EVENT_DETAILS },
+    { icon: "dining", label: "Food & dining", subtitle: "Menus, meals & more", step: steps.DINING_MENU },
+    { icon: "waitTimes", label: "Wait times", subtitle: "See ride queues", step: steps.LIVE_RIDE_WAIT_TIME },
+    { icon: "wavePool", label: "Water attractions", subtitle: "Wave pool & sessions", step: steps.WAVE_POOL_RAIN_DANCE },
+    { icon: "guidelines", label: "Ride guidelines", subtitle: "Height limits & tips", step: steps.RIDE_GUIDELINES },
+    { icon: "safety", label: "Safety & hygiene", subtitle: "Feel good, have fun", step: steps.SAFETY_AND_HYGIENE_INFO },
+    { icon: "maintenance", label: "Ride updates", subtitle: "Service information", step: steps.MAINTENANCE_LOG },
   ];
 
   return (
-    <div className="min-h-screen bg-[#f1f5fb]">
-      {/* Logo bar */}
-      <header className="flex justify-center border-b border-[#e1e8f2] bg-white px-4 py-2.5">
-        <Wordmark logoUrl={logo} />
+    <div className="min-h-screen bg-[#f4f7fc] pb-7">
+      <header className="flex h-[68px] items-center justify-between border-b border-[#e7edf7] bg-white px-5">
+        <Wordmark logoUrl={logoUrl || "/wonderla/logo.png"} />
+        {parkName && (
+          <span className="max-w-[46%] truncate rounded-full bg-[#eef3ff] px-3 py-2 font-mulish text-xs font-extrabold text-[#244bb0]">
+            <span aria-hidden="true" className="mr-1.5">●</span>{parkName}
+          </span>
+        )}
       </header>
 
-      <div className="mx-auto max-w-[560px] px-4 pb-8 pt-4 sm:px-5 sm:pt-5">
-        {/* Hero banner — single focal image, clean */}
-        <div className="relative aspect-[16/9] w-full min-h-[190px] max-h-[275px] overflow-hidden rounded-[24px] border border-[#d4deed] bg-[#183d9a] shadow-[0_10px_24px_rgba(15,31,100,0.16)]">
-          {heroImage ? (
-            <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
-          ) : (
-            <div className="absolute inset-0 bg-[#244bb0]" />
-          )}
-          <div className="absolute inset-0 bg-black/35" />
-          <div aria-hidden="true" className="absolute -right-12 -top-14 size-56 rounded-full border-[28px] border-white/10 sm:size-64" />
-          <div aria-hidden="true" className="absolute right-10 top-12 size-20 rounded-full border border-white/20 sm:right-14 sm:top-16 sm:size-24" />
-          <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7">
-            <span className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-3 py-1 font-mulish text-[10px] font-extrabold uppercase tracking-[0.18em] text-white">
-              The fun starts here
+      <div className="mx-auto max-w-[560px] px-4 pb-2 pt-4 sm:px-5 sm:pt-5">
+        <section className="relative isolate min-h-[285px] overflow-hidden rounded-[28px] bg-[#102e7b] shadow-[0_16px_36px_rgba(24,61,154,0.23)] sm:min-h-[320px]" aria-label="Welcome to Wonderla">
+          {heroImage && <img src={heroImage} alt="" fetchPriority="high" className="absolute inset-0 -z-20 h-full w-full object-cover" />}
+          <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#091943]/95 via-[#102e7b]/38 to-[#102e7b]/5" />
+          <div aria-hidden="true" className="absolute -right-16 -top-24 -z-10 size-64 rounded-full border-[32px] border-white/[0.09]" />
+          <div aria-hidden="true" className="absolute -right-6 top-5 -z-10 size-32 rounded-full border border-white/20" />
+
+          <div className="absolute inset-x-0 bottom-0 p-5 pb-6 sm:p-7 sm:pb-7">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 font-mulish text-[10px] font-extrabold uppercase tracking-[0.16em] text-white backdrop-blur-sm">
+              <span aria-hidden="true" className="size-1.5 rounded-full bg-[#ffda36]" /> Your day starts here
             </span>
-            <h1 className="mt-3 font-anton text-[clamp(38px,10vw,52px)] uppercase leading-[0.9] tracking-tight text-white [text-shadow:0_2px_10px_rgba(0,0,0,0.25)]">
-              Welcome to<br />Wonderla
+            <h1 className="mt-3 max-w-[420px] font-anton text-[clamp(36px,10vw,50px)] uppercase leading-[0.98] tracking-tight text-white [text-shadow:0_2px_16px_rgba(0,0,0,0.2)]">
+              Let the fun<br />take over.
             </h1>
-            {parkName && <p className="mt-1 font-mulish text-sm font-bold text-yellow">📍 {parkName}</p>}
-          </div>
-        </div>
-
-        <div className="mb-3 mt-7 sm:mt-8">
-          <h2 className="font-anton text-2xl uppercase tracking-tight text-[#142653]">Explore the Park</h2>
-          <p className="mt-1 font-mulish text-sm text-[#63718c]">Choose what you want to discover.</p>
-        </div>
-
-        {/* Clean card grid */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-3.5">
-          {tiles.map((t) => (
+            <p className="mt-2 font-mulish text-sm font-semibold text-white/85">{parkName || "Welcome to Wonderla"}</p>
             <button
-              key={t.label}
               type="button"
-              aria-label={`${t.label}: ${t.subtitle}`}
-              onClick={() => updateStep(t.step)}
-              data-scroll-reveal
-              className="group flex min-h-[104px] items-start gap-2.5 rounded-2xl border border-[#d6e0ef] border-l-[3px] border-l-[#315ec0] bg-white p-3 text-left shadow-[0_4px_12px_rgba(28,54,103,0.06)] transition hover:-translate-y-0.5 hover:border-[#b7c9e8] hover:shadow-[0_9px_18px_rgba(28,54,103,0.12)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#8bb6ff] sm:min-h-[112px] sm:gap-3 sm:p-3.5"
+              onClick={() => updateStep(steps.PARK_MAP)}
+              className="mt-5 inline-flex min-h-11 items-center gap-3 rounded-full bg-white px-5 font-mulish text-sm font-extrabold text-[#183d9a] shadow-lg transition hover:bg-[#f1f5ff] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#ffda36]"
             >
-              <span
-                className="flex size-10 shrink-0 items-center justify-center rounded-xl text-[22px] transition-transform group-hover:scale-105 sm:size-11"
-                style={{ backgroundColor: t.tint, color: t.color }}
-              >
-                <span aria-hidden="true" className="leading-none">{tileIcons[t.icon]}</span>
-              </span>
-              <span className="min-w-0 flex-1 pt-0.5">
-                <span className="block font-anton text-[13px] uppercase leading-tight tracking-tight text-[#0F1C3F] sm:text-[15px]">
-                  {t.label}
-                </span>
-                <span className="mt-1 block font-mulish text-[12px] leading-snug text-[#0F1C3F]/75 sm:text-[12px]">
-                  {t.subtitle}
-                </span>
-              </span>
-              <span aria-hidden="true" className="mt-2 text-lg font-semibold text-[#7d91b6] transition-transform group-hover:translate-x-0.5 group-hover:text-[#244bb0]">›</span>
+              Explore park map <span aria-hidden="true" className="text-lg leading-none">→</span>
             </button>
-          ))}
-        </div>
+          </div>
+        </section>
 
-        <p className="mt-8 text-center font-mulish text-[11px] font-semibold uppercase tracking-[0.25em] text-[#7d8eae]">
-          Have a Wonder-ful day!
-        </p>
+        <section className="mt-7" aria-labelledby="visit-heading">
+          <div className="mb-3 flex items-end justify-between gap-3 px-0.5">
+            <div>
+              <p className="font-mulish text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#5270b5]">Make the most of today</p>
+              <h2 id="visit-heading" className="mt-1 font-anton text-[26px] uppercase leading-none tracking-tight text-[#142653]">Plan your visit</h2>
+            </div>
+            <span className="pb-0.5 font-mulish text-xs font-semibold text-[#7785a0]">Pick a guide</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => updateStep(steps.PARK_MAP)}
+            data-scroll-reveal
+            className="group mb-3 flex min-h-[92px] w-full items-center gap-3.5 rounded-[20px] border border-[#dce6f8] bg-gradient-to-r from-[#e8efff] to-white p-4 text-left shadow-[0_5px_16px_rgba(36,75,176,0.07)] transition hover:-translate-y-0.5 hover:shadow-[0_9px_22px_rgba(36,75,176,0.12)] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#a9c4ff]"
+          >
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[#244bb0] text-[25px] text-white shadow-[0_5px_12px_rgba(36,75,176,0.25)]" aria-hidden="true">{tileIcons.parkMap}</span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-anton text-[18px] uppercase leading-tight tracking-tight text-[#142653]">Park map</span>
+              <span className="mt-1 block font-mulish text-xs text-[#60708f]">Find rides, food and facilities</span>
+            </span>
+            <span aria-hidden="true" className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white text-xl text-[#244bb0] shadow-sm transition-transform group-hover:translate-x-0.5">→</span>
+          </button>
+
+          <div className="grid grid-cols-2 gap-3">
+            {tiles.map((tile) => (
+              <button
+                key={tile.label}
+                type="button"
+                aria-label={`${tile.label}: ${tile.subtitle}`}
+                onClick={() => updateStep(tile.step)}
+                data-scroll-reveal
+                className="group flex min-h-[112px] flex-col items-start rounded-[18px] border border-[#e2e8f2] bg-white p-3.5 text-left shadow-[0_3px_12px_rgba(26,49,94,0.045)] transition hover:-translate-y-0.5 hover:border-[#bfd0f4] hover:shadow-[0_8px_18px_rgba(26,49,94,0.1)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#a9c4ff] sm:min-h-[120px] sm:p-4"
+              >
+                <span className="flex size-9 items-center justify-center rounded-xl bg-[#eef3ff] text-xl text-[#244bb0] transition-transform group-hover:scale-105" aria-hidden="true">{tileIcons[tile.icon]}</span>
+                <span className="mt-2.5 block font-anton text-[14px] uppercase leading-tight tracking-tight text-[#17274f]">{tile.label}</span>
+                <span className="mt-1 block font-mulish text-[11px] leading-snug text-[#74819a]">{tile.subtitle}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <footer className="mt-7 flex items-center justify-center gap-2 font-mulish text-[10px] font-bold uppercase tracking-[0.18em] text-[#8491aa]">
+          <span aria-hidden="true" className="text-[#315ec0]">✦</span> Have a Wonder-ful day <span aria-hidden="true" className="text-[#315ec0]">✦</span>
+        </footer>
       </div>
     </div>
   );
