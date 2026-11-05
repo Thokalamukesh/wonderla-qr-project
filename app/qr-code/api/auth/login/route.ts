@@ -31,7 +31,9 @@ export async function POST(req: NextRequest) {
   const res = NextResponse.json({ ok: true, user: session });
   res.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
-    sameSite: "lax",
+    // Flutter is hosted on a separate Vercel origin, so its credentialed API
+    // requests need a cross-site cookie in production.
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge,
