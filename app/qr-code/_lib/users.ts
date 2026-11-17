@@ -12,7 +12,7 @@ import path from "path";
 import crypto from "crypto";
 import { DATA_DIR } from "./paths";
 import { hasVercelBlob, isVercelRuntime, readStoredText, writeStoredText } from "./persistent-storage";
-import type { Role, Session } from "./auth";
+import { EDIT_SECTIONS, type EditSection, type Role, type Session } from "./auth";
 
 const USERS_FILE = path.join(DATA_DIR, "users.json");
 
@@ -22,6 +22,7 @@ interface StoredUser {
   hash: string;
   role: Role;
   parkSlug?: string;
+  permissions?: string[];
   createdAt: string;
 }
 
@@ -29,6 +30,7 @@ export interface PublicUser {
   username: string;
   role: Role;
   parkSlug?: string;
+  permissions: string[];
   createdAt: string;
 }
 
@@ -49,10 +51,19 @@ function makeUser(
   username: string,
   password: string,
   role: Role,
-  parkSlug?: string
+  parkSlug?: string,
+  permissions?: string[]
 ): StoredUser {
   const { salt, hash } = hashPassword(password);
-  return { username, salt, hash, role, parkSlug, createdAt: new Date().toISOString() };
+  return {
+    username,
+    salt,
+    hash,
+    role,
+    parkSlug,
+    permissions: role === "superadmin" ? ["all"] : (permissions ?? ["all"]),
+    createdAt: new Date().toISOString(),
+  };
 }
 
 async function readAll(): Promise<StoredUser[]> {
@@ -76,7 +87,25 @@ async function writeAll(users: StoredUser[]): Promise<void> {
 }
 
 function toPublic(u: StoredUser): PublicUser {
-  return { username: u.username, role: u.role, parkSlug: u.parkSlug, createdAt: u.createdAt };
+  return {
+    username: u.username,
+    role: u.role,
+    parkSlug: u.parkSlug,
+    permissions: u.permissions ?? ["all"],
+    createdAt: u.createdAt,
+  };
+}
+
+function normalizePermissions(role: Role, permissions?: string[]): string[] {
+  if (role === "superadmin") return ["all"];
+  if (permissions === undefined) return ["all"];
+  if (!Array.isArray(permissions)) throw new Error("Choose at least one access section");
+  if (permissions.includes("all")) return ["all"];
+  const valid = [...new Set(permissions)].filter((value): value is EditSection =>
+    (EDIT_SECTIONS as readonly string[]).includes(value),
+  );
+  if (valid.length === 0) throw new Error("Choose at least one access section");
+  return valid;
 }
 
 /** Validate credentials; env admin always works as bootstrap superadmin. */
@@ -89,13 +118,31 @@ export async function verifyCredentials(
   const envU = (process.env.QR_ADMIN_USERNAME || "admin").trim();
   const envP = (process.env.QR_ADMIN_PASSWORD || "wonderla@admin").trim();
   if (username === envU && password === envP) {
-    return { username, role: "superadmin" };
+    return { username, role: "superadmin", permissions: ["all"] };
   }
   const users = await readAll();
   const found = users.find((u) => u.username === username);
   if (!found) return null;
   if (!verifyPassword(password, found.salt, found.hash)) return null;
-  return { username: found.username, role: found.role, parkSlug: found.parkSlug };
+  const publicUser = toPublic(found);
+  return {
+    username: publicUser.username,
+    role: publicUser.role,
+    parkSlug: publicUser.parkSlug,
+    permissions: publicUser.permissions,
+  };
+}
+
+export async function getSessionUser(username: string): Promise<Session | null> {
+  const found = (await readAll()).find((user) => user.username === username);
+  if (!found) return null;
+  const publicUser = toPublic(found);
+  return {
+    username: publicUser.username,
+    role: publicUser.role,
+    parkSlug: publicUser.parkSlug,
+    permissions: publicUser.permissions,
+  };
 }
 
 export async function listUsers(): Promise<PublicUser[]> {
@@ -107,22 +154,45 @@ export async function createUser(
   username: string,
   password: string,
   role: Role,
-  parkSlug?: string
+  parkSlug?: string,
+  permissions?: string[]
 ): Promise<PublicUser> {
   username = username.trim();
   if (!username) throw new Error("Username is required");
   if (!password || password.length < 6)
     throw new Error("Password must be at least 6 characters");
   if (role === "park" && !parkSlug) throw new Error("A park must be selected for a park user");
+  const normalizedPermissions = normalizePermissions(role, permissions);
 
   const users = await readAll();
   if (users.some((u) => u.username === username))
     throw new Error(`User "${username}" already exists`);
 
-  const user = makeUser(username, password, role, role === "park" ? parkSlug : undefined);
+  const user = makeUser(
+    username,
+    password,
+    role,
+    role === "park" ? parkSlug : undefined,
+    normalizedPermissions,
+  );
   users.push(user);
   await writeAll(users);
   return toPublic(user);
+}
+
+export async function updateUserPermissions(
+  username: string,
+  permissions: string[],
+): Promise<PublicUser | null> {
+  const users = await readAll();
+  const target = users.find((user) => user.username === username);
+  if (!target) return null;
+  if (target.role === "superadmin") {
+    throw new Error("Superadmins always have full access");
+  }
+  target.permissions = normalizePermissions(target.role, permissions);
+  await writeAll(users);
+  return toPublic(target);
 }
 
 export async function deleteUser(username: string): Promise<boolean> {

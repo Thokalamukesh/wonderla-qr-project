@@ -12,7 +12,7 @@ export async function GET() {
 
 // Superadmin only: create a new park
 export async function POST(req: NextRequest) {
-  if (!isSuperadmin(sessionFromRequest(req))) {
+  if (!isSuperadmin(await sessionFromRequest(req))) {
     return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
   }
   let body: { name?: string; location?: string; slug?: string };

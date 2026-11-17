@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sessionFromRequest, isSuperadmin, canEditPark } from "../../../_lib/auth";
+import { sessionFromRequest, isSuperadmin, canEditPark, canEditSection, EDIT_SECTIONS } from "../../../_lib/auth";
 import { getPark, savePark, deletePark } from "../../../_lib/store";
 import type { ParkConfig } from "../../../_lib/types";
+import { isDeepStrictEqual } from "node:util";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,7 +20,7 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
 // Superadmin (any park) or park user (own park): update config
 export async function PUT(req: NextRequest, { params }: Ctx) {
   const { park } = await params;
-  const session = sessionFromRequest(req);
+  const session = await sessionFromRequest(req);
   if (!canEditPark(session, park)) {
     return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
   }
@@ -38,6 +39,22 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
   const merged: ParkConfig = { ...existing, ...body, slug: existing.slug };
   if (!isSuperadmin(session)) merged.active = existing.active;
 
+  if (!isSuperadmin(session)) {
+    const sectionFields: Record<(typeof EDIT_SECTIONS)[number], (keyof ParkConfig)[]> = {
+      "Park overview": ["name", "location", "logoUrl", "heroImageUrl", "landingIcons"],
+      "Rides": ["rides"], "Events": ["events"], "Dining & menus": ["dining"],
+      "Live wait times": ["liveWaitTimes"], "Wave pool & rain dance": ["waveRainDance"],
+      "Safety & hygiene": ["safetyHygiene"], "Maintenance log": ["maintenanceLog"],
+      "Ride guidelines": ["rideGuidelines"], "Park map & places": ["parkMap"],
+    };
+    const allowed = new Set<keyof ParkConfig>(
+      EDIT_SECTIONS.filter((section) => canEditSection(session, section)).flatMap((section) => sectionFields[section]),
+    );
+    const protectedKeys: (keyof ParkConfig)[] = ["name", "location", "logoUrl", "heroImageUrl", "landingIcons", "rides", "events", "dining", "liveWaitTimes", "waveRainDance", "safetyHygiene", "maintenanceLog", "rideGuidelines", "parkMap"];
+    const forbidden = protectedKeys.filter((key) => !allowed.has(key) && Object.hasOwn(body, key) && !isDeepStrictEqual(body[key], existing[key]));
+    if (forbidden.length) return NextResponse.json({ ok: false, error: "You do not have access to edit these sections." }, { status: 403 });
+  }
+
   try {
     const saved = await savePark(merged);
     return NextResponse.json({ ok: true, config: saved });
@@ -50,7 +67,7 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 // Superadmin only: delete a park
 export async function DELETE(req: NextRequest, { params }: Ctx) {
   const { park } = await params;
-  if (!isSuperadmin(sessionFromRequest(req))) {
+  if (!isSuperadmin(await sessionFromRequest(req))) {
     return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
   }
   const ok = await deletePark(park);

@@ -28,7 +28,7 @@ export async function GET() {
 }
 
 export async function PUT(req: NextRequest) {
-  if (!isSuperadmin(sessionFromRequest(req))) {
+  if (!isSuperadmin(await sessionFromRequest(req))) {
     return NextResponse.json({ ok: false, error: "Only a superadmin can update map settings." }, { status: 403 });
   }
 

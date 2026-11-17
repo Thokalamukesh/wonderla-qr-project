@@ -5,6 +5,6 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  const session = sessionFromRequest(req);
+  const session = await sessionFromRequest(req);
   return NextResponse.json({ authenticated: !!session, user: session });
 }

@@ -12,7 +12,7 @@ const extensions: Record<string, string> = { "image/jpeg": ".jpg", "image/png": 
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ park: string }> }) {
   const { park } = await params;
-  if (!canEditPark(sessionFromRequest(request), park)) return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
+  if (!canEditPark(await sessionFromRequest(request), park)) return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
   try {
     const form = await request.formData();
     const image = form.get("image");
